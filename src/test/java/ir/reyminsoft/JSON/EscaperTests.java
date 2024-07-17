@@ -9,8 +9,18 @@ public class EscaperTests implements TestClass {
 
     public static void simple_escaping() {
         Escaper escaper = new Escaper('*');
+        escaper.addCharToEscape('s');
         String[] strings = new String[]{
-                "*hi",
+                "s",
+                "*si",
+                "*s s i",
+                "**hi",
+                "***si",
+                "****hi",
+                "* *  *",
+                "*",
+                "********************************",
+                "/\\dafskmjml;ksjfieroiqurpoi4eupioru2349u2390**"
         };
         for (String original : strings) {
             Utils.print(original);
@@ -21,6 +31,10 @@ public class EscaperTests implements TestClass {
             Utils.print("==================================");
             TestClassRunner.assertEquals(unescaped, original);
         }
+
+    }
+
+    public static void extreme_case(){
 
     }
 
