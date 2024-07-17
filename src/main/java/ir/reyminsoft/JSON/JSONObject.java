@@ -262,5 +262,10 @@ public class JSONObject {
         return (Boolean) object;
     }
 
+    public <T> T get(String key) {
+        Object object = hashtable.get(key);
+        return (T) object;
+    }
+
 
 }
