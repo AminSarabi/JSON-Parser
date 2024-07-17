@@ -38,9 +38,12 @@ public class Escaper {
             if (positions.contains(y)) {
                 second[x] = escapingChar;
                 x++;
+                second[x] = handleControlChar(chars[y]);
+            } else {
+                second[x] = chars[y];
             }
-            second[x] = chars[y];
             y++;
+
         }
         return second;
     }
@@ -59,8 +62,10 @@ public class Escaper {
                 if (x + 1 == chars.length) last = true;
                 else if (chars[x + 1] != escapingChar) last = true;
                 if (first && last) {
-                    if (!charsToEscape.contains(chars[x + 1]))
-                        throw new RuntimeException("char at " + x + " is a single escaping character." + " " + new String(Arrays.copyOfRange(chars,x-5,x+5)));
+                    char next = chars[x + 1];
+                    char replacement = replaceWithControl(next);
+                    if (replacement == next && !charsToEscape.contains(next))
+                        throw new RuntimeException("char at " + x + " is a single escaping character." + " " + new String(Arrays.copyOfRange(chars, x - 5, x + 5)));
                 }
                 if (first) {
                     start = x;
@@ -86,11 +91,12 @@ public class Escaper {
         char[] second = new char[chars.length - toRemove];
         int o = 0;
         for (int s = 0; s < second.length; s++) {
+            boolean wasEscaped = false;
             if (startEnds.containsKey(o)) {
                 int end = startEnds.get(o);
                 int count = end - o + 1;
                 int countToKeep = count / 2;
-
+                wasEscaped = count % 2 != 0;
                 for (int k = 0; k != countToKeep; k++) {
                     second[s] = escapingChar;
                     s++;
@@ -98,7 +104,7 @@ public class Escaper {
                 o += count;
             }
             if (s < second.length && o < chars.length) {
-                second[s] = chars[o];
+                second[s] = wasEscaped ? replaceWithControl(chars[o]) : chars[o];
                 o++;
             }
         }
@@ -111,6 +117,31 @@ public class Escaper {
 
     public String unescape(String str) {
         return new String(unescape(str.toCharArray()));
+    }
+
+
+    private char handleControlChar(char ch) {
+        return switch (ch) {
+            case '\n' -> 'n';
+            case '\t' -> 't';
+            case '\b' -> 'b';
+            case '\r' -> 'r';
+            case '\f' -> 'f';
+            case '\0' -> '0';
+            default -> ch;
+        };
+    }
+
+    private char replaceWithControl(char ch) {
+        return switch (ch) {
+            case 'n' -> '\n';
+            case 't' -> '\t';
+            case 'b' -> '\b';
+            case 'r' -> '\r';
+            case 'f' -> '\f';
+            case '0' -> '\0';
+            default -> ch;
+        };
     }
 
 }
