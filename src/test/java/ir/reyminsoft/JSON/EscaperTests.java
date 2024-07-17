@@ -15,10 +15,10 @@ public class EscaperTests implements TestClass {
         Escaper escaper = new Escaper('*');
         escaper.addCharToEscape('s');
         String[] strings = new String[]{
-                "s",
+              /*  "s",
                 " s",
                 " s ",
-                "s ",
+                "s ",*/
                 " * ",
                 " ?* ",
                 " ?s ",

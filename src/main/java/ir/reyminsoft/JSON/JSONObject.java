@@ -23,7 +23,7 @@ public class JSONObject {
         this.hashtable = hashtable;
     }
 
-    public static Hashtable<String, Object> readObject(Cursor cursor) {
+    public static Hashtable<String, Object> readObject(Cursor cursor) /**/{
         int beginCursor = cursor.currentIndex();
         Hashtable<String, Object> table = new Hashtable<>();
         boolean readingValue = false;
@@ -125,7 +125,7 @@ public class JSONObject {
                     }
                     break;
 
-            }
+            }/**/
             cursor.increment();
         }
         if (!braces.empty()) {

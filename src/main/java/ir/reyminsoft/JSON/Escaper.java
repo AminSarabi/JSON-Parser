@@ -2,7 +2,6 @@ package ir.reyminsoft.JSON;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Set;
 
 public class Escaper {
@@ -47,7 +46,6 @@ public class Escaper {
                 second[x] = chars[y];
             }
             y++;
-
         }
         return second;
     }
@@ -57,9 +55,10 @@ public class Escaper {
     }
 
     public char[] unescape(char[] chars, int start, int end) {
-        Hashtable<Integer, Integer> startEnds = new Hashtable<>();
+        char[] second = new char[end - start];
         int firstEscapeChar = 0;
-        int toRemove = 0;
+        int secondIndex = 0;
+        int removed = 0;
         for (int x = start; x != end; x++) {
             if (chars[x] == escapingChar) {
                 boolean first = false;
@@ -78,45 +77,27 @@ public class Escaper {
                     firstEscapeChar = x;
                 }
                 if (last) {
-                    startEnds.put(firstEscapeChar, x);
                     int count = x - firstEscapeChar + 1;
-                    if (count % 2 == 0) {
-                        toRemove += count / 2;
-                    } else {
-                        if (x + 1 == chars.length)
-                            throw new RuntimeException("odd count of escape chars from " + first + " to " + x + " escape nothing. eof");
-                        char escaped = chars[x];
-                        if (!shouldEscape(escaped)) {
-                            throw new RuntimeException("odd count of escape chars from " + first + " to " + x + " escape " + escaped + " but it is not a special char");
-                        }
-                        toRemove += count / 2 + 1;
+                    int countToKeep = count / 2;
+                    for (int k = 0; k != countToKeep; k++) {
+                        second[secondIndex] = escapingChar;
+                        secondIndex++;
                     }
-
+                    if (count % 2 == 0) continue;
+                    if (secondIndex >= second.length) break;
+                    x++; //move to the next character which is the escaped character.
+                    if (x >= end) break;
+                    second[secondIndex] = replaceWithControl(chars[x]);
+                    secondIndex++;
                 }
+
+            } else {
+                if (secondIndex >= second.length) break;
+                second[secondIndex] = chars[x];
+                secondIndex++;
             }
         }
-
-        char[] second = new char[end - start - toRemove];
-        int o = start;
-        for (int s = 0; s < second.length; s++) {
-            boolean wasEscaped = false;
-            if (startEnds.containsKey(o)) {
-                int lastEscapeChar = startEnds.get(o);
-                int count = lastEscapeChar - o + 1;
-                int countToKeep = count / 2;
-                wasEscaped = count % 2 != 0;
-                for (int k = 0; k != countToKeep; k++) {
-                    second[s] = escapingChar;
-                    s++;
-                }
-                o += count;
-            }
-            if (s < second.length && o < chars.length) {
-                second[s] = wasEscaped ? replaceWithControl(chars[o]) : chars[o];
-                o++;
-            }
-        }
-        return second;
+        return Arrays.copyOfRange(second, 0, secondIndex);
     }
 
     public char[] unescape(char[] chars) {
