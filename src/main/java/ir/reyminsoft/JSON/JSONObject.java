@@ -202,7 +202,7 @@ public class JSONObject {
         replaced = replaced.replaceAll("}", Matcher.quoteReplacement("\\}"));
         replaced = replaced.replaceAll(",", Matcher.quoteReplacement("\\,"));
         replaced = replaced.replaceAll(":", Matcher.quoteReplacement("\\:"));
-        replaced = replaced.replaceAll("\\\\", Matcher.quoteReplacement("\\"));
+        replaced = replaced.replaceAll("\\\\", Matcher.quoteReplacement("\\\\"));
         return replaced;
     }
 
