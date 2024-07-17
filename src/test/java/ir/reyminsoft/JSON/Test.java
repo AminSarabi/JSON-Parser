@@ -1,37 +1,19 @@
 package ir.reyminsoft.JSON;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Hashtable;
 import java.util.Random;
 
 import static ir.reyminsoft.JSON.TestClassRunner.assertEquals;
-import static ir.reyminsoft.JSON.Utils.print;
 
 public class Test implements TestClass {
+
+    public static Random random = new Random();
 
     public static void main(String[] args) {
 
         TestClassRunner.run(Test.class);
 
-    }
-
-    public static Random random = new Random();
-
-    public static String randomString() {
-        StringBuilder str = new StringBuilder();
-        String array = "{}\"\\(),.:#@!/-=[]abcdefghijklmnopqrstuvwxyz1234567890\n\r\t\b\f";
-        String[] array2 = new String[]{"null", "false", "true", "\r\n"};
-        for (int x = 0; x != 32; x++) {
-            char ch = array.charAt(random.nextInt(array.length()));
-            str.append(random.nextBoolean() ? Character.toLowerCase(ch) : Character.toUpperCase(ch));
-            if (random.nextBoolean()) str.append(" ").append(array2[random.nextInt(array2.length)]).append(" ");
-            if (random.nextBoolean()) str.append("  ");
-            if (random.nextBoolean()) {
-                byte[] bytes = new byte[8];
-                random.nextBytes(bytes);
-                str.append(new String(bytes, StandardCharsets.UTF_8));
-            }
-        }
-        return str.toString();
     }
 
     public static void parse_parse_empty_json() {
@@ -121,8 +103,8 @@ public class Test implements TestClass {
         JSONObject object = new JSONObject(str);
         boolean a = object.getBoolean("a");
         boolean b = object.getBoolean("b");
-        assertEquals(a,true);
-        assertEquals(b,false);
+        assertEquals(a, true);
+        assertEquals(b, false);
     }
 
 
@@ -132,7 +114,6 @@ public class Test implements TestClass {
         assertEquals(object.toString(), str);
     }
 
-
     public static void special_characters_escaping() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("key", "[][[]{} \" \" \"");
@@ -141,10 +122,46 @@ public class Test implements TestClass {
         assertEquals(object.toString(), jsonObject.toString());
     }
 
-    public static void handles_null(){
+    public static void handles_null() {
         String str = "{\"a\":NULL,\"b\":null}";
         JSONObject object = new JSONObject(str);
-        assertEquals(object.getString("a"),null);
+        assertEquals(object.getString("a"), null);
+    }
+
+
+    public static String randomString() {
+        StringBuilder str = new StringBuilder();
+        String array = "{}\"\\(),.:#@!/-=[]abcdefghijklmnopqrstuvwxyz1234567890\n\r\t\b\f";
+        String[] array2 = new String[]{"null", "false", "true", "\r\n"};
+        for (int x = 0; x != 32; x++) {
+            char ch = array.charAt(random.nextInt(array.length()));
+            str.append(random.nextBoolean() ? Character.toLowerCase(ch) : Character.toUpperCase(ch));
+            if (random.nextBoolean()) str.append(" ").append(array2[random.nextInt(array2.length)]).append(" ");
+            if (random.nextBoolean()) str.append("  ");
+            if (random.nextBoolean()) {
+                byte[] bytes = new byte[8];
+                random.nextBytes(bytes);
+                str.append(new String(bytes, StandardCharsets.UTF_8));
+            }
+        }
+        return str.toString();
+    }
+
+    public static void extreme_testing() {
+        JSONObject jsonObject = new JSONObject();
+        Hashtable<String, String> hashtable = new Hashtable<>();
+        for (int x = 0; x != 10; x++) {
+            String key = randomString();
+            String value = randomString();
+            jsonObject.put(key, value);
+            hashtable.put(key, value);
+        }
+        Utils.print(jsonObject.toString());
+        jsonObject = new JSONObject(jsonObject.toString());
+        for (String key : hashtable.keySet()) {
+            String value = hashtable.get(key);
+            assertEquals(jsonObject.getString(key), value);
+        }
     }
 
 }

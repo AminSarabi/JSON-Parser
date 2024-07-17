@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static ir.reyminsoft.JSON.Utils.*;
+import static ir.reyminsoft.JSON.Utils.stringify;
 
 public class TestClassRunner {
     public static void assertEquals(final Object o, final Object o2) {
