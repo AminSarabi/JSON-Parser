@@ -16,6 +16,10 @@ public class Escaper {
         this.charsToEscape.add(escapingChar);
     }
 
+    protected boolean shouldEscape(char ch) {
+        return charsToEscape.contains(ch);
+    }
+
     public void addCharToEscape(char ch) {
         this.charsToEscape.add(ch);
     }
@@ -24,15 +28,15 @@ public class Escaper {
         for (char ch : chars) addCharToEscape(ch);
     }
 
-    public char[] escape(char[] chars) {
+    public char[] escape(char[] chars, int start, int end) {
         Set<Integer> positions = new HashSet<>();
-        for (int x = 0; x != chars.length; x++) {
+        for (int x = start; x != end; x++) {
             char ch = chars[x];
-            if (charsToEscape.contains(ch)) {
+            if (shouldEscape(ch)) {
                 positions.add(x);
             }
         }
-        char[] second = new char[positions.size() + chars.length];
+        char[] second = new char[positions.size() + end - start];
         int y = 0;
         for (int x = 0; x != second.length; x++) {
             if (positions.contains(y)) {
@@ -48,53 +52,57 @@ public class Escaper {
         return second;
     }
 
-    public char[] unescape(char[] chars) {
+    public char[] escape(char[] chars) {
+        return escape(chars, 0, chars.length);
+    }
+
+    public char[] unescape(char[] chars, int start, int end) {
         Hashtable<Integer, Integer> startEnds = new Hashtable<>();
-        int start = 0;
+        int firstEscapeChar = 0;
         int toRemove = 0;
-        for (int x = 0; x != chars.length; x++) {
-            char ch = chars[x];
-            if (ch == escapingChar) {
+        for (int x = start; x != end; x++) {
+            if (chars[x] == escapingChar) {
                 boolean first = false;
                 boolean last = false;
                 if (x == 0) first = true;
                 else if (chars[x - 1] != escapingChar) first = true;
-                if (x + 1 == chars.length) last = true;
+                if (x + 1 == end) last = true;
                 else if (chars[x + 1] != escapingChar) last = true;
                 if (first && last) {
                     char next = chars[x + 1];
                     char replacement = replaceWithControl(next);
-                    if (replacement == next && !charsToEscape.contains(next))
+                    if (replacement == next && !shouldEscape(next))
                         throw new RuntimeException("char at " + x + " is a single escaping character." + " " + new String(Arrays.copyOfRange(chars, x - 5, x + 5)));
                 }
                 if (first) {
-                    start = x;
+                    firstEscapeChar = x;
                 }
                 if (last) {
-                    startEnds.put(start, x);
-                    int count = x - start + 1;
+                    startEnds.put(firstEscapeChar, x);
+                    int count = x - firstEscapeChar + 1;
                     if (count % 2 == 0) {
                         toRemove += count / 2;
                     } else {
                         if (x + 1 == chars.length)
                             throw new RuntimeException("odd count of escape chars from " + first + " to " + x + " escape nothing. eof");
                         char escaped = chars[x];
-                        if (!charsToEscape.contains(escaped)) {
+                        if (!shouldEscape(escaped)) {
                             throw new RuntimeException("odd count of escape chars from " + first + " to " + x + " escape " + escaped + " but it is not a special char");
                         }
                         toRemove += count / 2 + 1;
                     }
+
                 }
             }
         }
 
-        char[] second = new char[chars.length - toRemove];
-        int o = 0;
+        char[] second = new char[end - start - toRemove];
+        int o = start;
         for (int s = 0; s < second.length; s++) {
             boolean wasEscaped = false;
             if (startEnds.containsKey(o)) {
-                int end = startEnds.get(o);
-                int count = end - o + 1;
+                int lastEscapeChar = startEnds.get(o);
+                int count = lastEscapeChar - o + 1;
                 int countToKeep = count / 2;
                 wasEscaped = count % 2 != 0;
                 for (int k = 0; k != countToKeep; k++) {
@@ -109,6 +117,10 @@ public class Escaper {
             }
         }
         return second;
+    }
+
+    public char[] unescape(char[] chars) {
+        return unescape(chars, 0, chars.length);
     }
 
     public String escape(String str) {

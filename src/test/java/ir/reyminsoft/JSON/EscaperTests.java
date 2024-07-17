@@ -2,7 +2,7 @@ package ir.reyminsoft.JSON;
 
 import java.util.Hashtable;
 
-import static ir.reyminsoft.JSON.Test.randomString;
+import static ir.reyminsoft.JSON.ObjectTests.randomString;
 
 public class EscaperTests implements TestClass {
 

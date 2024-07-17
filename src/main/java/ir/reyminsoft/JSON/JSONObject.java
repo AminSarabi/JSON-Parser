@@ -5,12 +5,7 @@ import java.util.Stack;
 
 public class JSONObject {
 
-    private static final Escaper escaper;
-
-    static {
-        escaper = new Escaper('\\');
-        escaper.addCharToEscape('{', '}', '\"', ',', ':', '\t', '\b', '\t', '\f', '\n', '\r');
-    }
+    private static final JSONEscaper escaper = new JSONEscaper();
 
     public static final Object NULL = new Object();
     private final Hashtable<String, Object> hashtable;
@@ -196,16 +191,13 @@ public class JSONObject {
             }
             cursor.increment();
         }
-        return stringifyDeEscaping(cursor.getRangeAsString(beginIndex, cursor.currentIndex()));
+        return new String(escaper.unescape(cursor.chars, beginIndex, cursor.currentIndex()));
     }
 
     public static String stringifyEscaping(String s) {
         return escaper.escape(s);
     }
 
-    public static String stringifyDeEscaping(String s) {
-        return escaper.unescape(s);
-    }
 
     public void put(String key, Object s) {
         this.hashtable.put(key, s);

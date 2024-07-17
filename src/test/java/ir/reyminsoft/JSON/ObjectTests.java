@@ -6,13 +6,13 @@ import java.util.Random;
 
 import static ir.reyminsoft.JSON.TestClassRunner.assertEquals;
 
-public class Test implements TestClass {
+public class ObjectTests implements TestClass {
 
     public static Random random = new Random();
 
     public static void main(String[] args) {
 
-        TestClassRunner.run(Test.class);
+        TestClassRunner.run(ObjectTests.class);
 
     }
 
@@ -129,24 +129,6 @@ public class Test implements TestClass {
     }
 
 
-
-    public static void escaper_tests() {
-        for (int x = 0; x != 10000; x++) {
-            String random = randomString();
-            String escaped = JSONObject.stringifyEscaping(random);
-            String deEscaped = JSONObject.stringifyDeEscaping(escaped);
-            if (!Utils.equals(deEscaped, random)) {
-                Utils.print("\n----------------------------------------");
-                Utils.print(random);
-                Utils.print("\n----------------------------------------");
-                Utils.print(escaped);
-                Utils.print("\n----------------------------------------");
-                Utils.print(deEscaped);
-                Utils.print("\n----------------------------------------");
-            }
-            assertEquals(deEscaped, random);
-        }
-    }
 
     public static String randomString() {
         StringBuilder str = new StringBuilder();
