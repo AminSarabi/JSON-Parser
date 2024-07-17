@@ -2,9 +2,16 @@ package ir.reyminsoft.JSON;
 
 import java.util.Hashtable;
 import java.util.Stack;
-import java.util.regex.Matcher;
 
 public class JSONObject {
+
+    public static final Escaper escaper;
+
+    static {
+        escaper = new Escaper('\\');
+        escaper.addCharToEscape('{', '}', '\"', ',', ':', '\t', '\b', '\t', '\f', '\n', '\r'
+                , '[', ']');
+    }
 
     public static final Object NULL = new Object();
     private final Hashtable<String, Object> hashtable;
@@ -139,7 +146,7 @@ public class JSONObject {
         if (first == 't') {
             count = 4;
         } else if (first == 'f') {
-            count =5;
+            count = 5;
         } else cursor.throwUnrecognizedCharacter();
         cursor.assertNextChars(count);
         return Boolean.parseBoolean(cursor.getRangeAsString(count));
@@ -194,29 +201,11 @@ public class JSONObject {
     }
 
     public static String stringifyEscaping(String s) {
-        String replaced = s;
-        replaced = replaced.replaceAll("\"", Matcher.quoteReplacement("\\\""));
-        replaced = replaced.replaceAll("\\{", Matcher.quoteReplacement("\\{"));
-        replaced = replaced.replaceAll("\\[", Matcher.quoteReplacement("\\["));
-        replaced = replaced.replaceAll("]", Matcher.quoteReplacement("\\]"));
-        replaced = replaced.replaceAll("}", Matcher.quoteReplacement("\\}"));
-        replaced = replaced.replaceAll(",", Matcher.quoteReplacement("\\,"));
-        replaced = replaced.replaceAll(":", Matcher.quoteReplacement("\\:"));
-        replaced = replaced.replaceAll("\\\\", Matcher.quoteReplacement("\\\\"));
-        return replaced;
+        return escaper.escape(s);
     }
 
     public static String stringifyDeEscaping(String s) {
-        String replaced = s;
-        replaced = replaced.replaceAll("\\\\\"", Matcher.quoteReplacement("\""));
-        replaced = replaced.replaceAll("\\\\\\{", Matcher.quoteReplacement("{"));
-        replaced = replaced.replaceAll("\\\\\\[", Matcher.quoteReplacement("["));
-        replaced = replaced.replaceAll("\\\\]", Matcher.quoteReplacement("]"));
-        replaced = replaced.replaceAll("\\\\}", Matcher.quoteReplacement("}"));
-        replaced = replaced.replaceAll("\\\\,", Matcher.quoteReplacement(","));
-        replaced = replaced.replaceAll("\\\\:", Matcher.quoteReplacement(":"));
-        replaced = replaced.replaceAll("\\\\\\\\", Matcher.quoteReplacement("\\"));
-        return replaced;
+        return escaper.unescape(s);
     }
 
     public void put(String key, Object s) {
@@ -235,7 +224,7 @@ public class JSONObject {
                 first = false;
             }
             Object value = hashtable.get(key);
-            stringBuilder.append('"').append(key).append('"').append(':');
+            stringBuilder.append('"').append(stringifyEscaping(key)).append('"').append(':');
             if (value instanceof String) {
                 stringBuilder.append('"').append(stringifyEscaping(value.toString())).append('"');
             } else if (value == NULL) {

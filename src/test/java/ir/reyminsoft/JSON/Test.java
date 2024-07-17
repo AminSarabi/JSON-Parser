@@ -129,7 +129,7 @@ public class Test implements TestClass {
     }
 
 
-    @ThisTestOnly
+
     public static void escaper_tests() {
         for (int x = 0; x != 10000; x++) {
             String random = randomString();
@@ -165,6 +165,7 @@ public class Test implements TestClass {
         }
         return str.toString();
     }
+
 
     public static void extreme_testing() {
         JSONObject jsonObject = new JSONObject();

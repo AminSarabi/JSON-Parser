@@ -1,5 +1,6 @@
 package ir.reyminsoft.JSON;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
@@ -59,7 +60,7 @@ public class Escaper {
                 else if (chars[x + 1] != escapingChar) last = true;
                 if (first && last) {
                     if (!charsToEscape.contains(chars[x + 1]))
-                        throw new RuntimeException("char at " + x + " is a single escaping character.");
+                        throw new RuntimeException("char at " + x + " is a single escaping character." + " " + new String(Arrays.copyOfRange(chars,x-5,x+5)));
                 }
                 if (first) {
                     start = x;

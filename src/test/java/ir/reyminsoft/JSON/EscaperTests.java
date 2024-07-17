@@ -1,5 +1,9 @@
 package ir.reyminsoft.JSON;
 
+import java.util.Hashtable;
+
+import static ir.reyminsoft.JSON.Test.randomString;
+
 public class EscaperTests implements TestClass {
 
     public static void main(String[] args) {
@@ -12,6 +16,12 @@ public class EscaperTests implements TestClass {
         escaper.addCharToEscape('s');
         String[] strings = new String[]{
                 "s",
+                " s",
+                " s ",
+                "s ",
+                " * ",
+                " ?* ",
+                " ?s ",
                 "*si",
                 "*s s i",
                 "**hi",
@@ -19,8 +29,8 @@ public class EscaperTests implements TestClass {
                 "****hi",
                 "* *  *",
                 "*",
-                "********************************",
-                "/\\dafskmjml;ksjfieroiqurpoi4eupioru2349u2390**"
+                "********s****************s********",
+                "/\\dafskmjml;k s\njfieroiqurpoi4eupissosru2s349u2390**"
         };
         for (String original : strings) {
             Utils.print(original);
@@ -34,8 +44,22 @@ public class EscaperTests implements TestClass {
 
     }
 
+    @ThisTestOnly
     public static void extreme_case(){
-
+        Escaper escaper = new Escaper('\\');
+        escaper.addCharToEscape('{', '}', '\"', ',', ':', '\t', '\b', '\t', '\f', '\n', '\r'
+                , '[', ']');
+        Hashtable<String, String> hashtable = new Hashtable<>();
+        for (int x = 0; x != 10; x++) {
+            String original = randomString();
+            Utils.print(original);
+            String escaped = escaper.escape(original);
+            Utils.print(escaped);
+            String unescaped = escaper.unescape(escaped);
+            Utils.print(unescaped);
+            Utils.print("==================================");
+            TestClassRunner.assertEquals(unescaped, original);
+        }
     }
 
 }
