@@ -11,7 +11,7 @@ public class JSONObject {
     private final Hashtable<String, Object> hashtable;
 
     public JSONObject(String jsonString) {
-        Cursor cursor = new Cursor(jsonString.trim().toCharArray());
+        Cursor cursor = new Cursor(jsonString.toCharArray());
         this.hashtable = readObject(cursor);
     }
 
@@ -191,7 +191,7 @@ public class JSONObject {
             }
             cursor.increment();
         }
-        return new String(escaper.unescape(cursor.chars, beginIndex, cursor.currentIndex()));
+        return escaper.unescape(cursor.chars, beginIndex, cursor.currentIndex());
     }
 
     public static String stringifyEscaping(String s) {

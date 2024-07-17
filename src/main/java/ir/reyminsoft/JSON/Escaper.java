@@ -54,11 +54,10 @@ public class Escaper {
         return escape(chars, 0, chars.length);
     }
 
-    public char[] unescape(char[] chars, int start, int end) {
+    public String unescape(char[] chars, int start, int end) {
         char[] second = new char[end - start];
         int firstEscapeChar = 0;
         int secondIndex = 0;
-        int removed = 0;
         for (int x = start; x != end; x++) {
             if (chars[x] == escapingChar) {
                 boolean first = false;
@@ -97,10 +96,10 @@ public class Escaper {
                 secondIndex++;
             }
         }
-        return Arrays.copyOfRange(second, 0, secondIndex);
+        return new String(second, 0, secondIndex);
     }
 
-    public char[] unescape(char[] chars) {
+    public String unescape(char[] chars) {
         return unescape(chars, 0, chars.length);
     }
 
@@ -109,7 +108,7 @@ public class Escaper {
     }
 
     public String unescape(String str) {
-        return new String(unescape(str.toCharArray()));
+        return unescape(str.toCharArray());
     }
 
 
