@@ -5,10 +5,11 @@ import java.util.Stack;
 
 public class JSONObject {
 
-    private static final JSONEscaper escaper = new JSONEscaper();
+    protected static final JSONEscaper escaper = new JSONEscaper();
 
     public static final Object NULL = new Object();
     private final Hashtable<String, Object> hashtable;
+
 
     public JSONObject(String jsonString) {
         Cursor cursor = new Cursor(jsonString.toCharArray());
@@ -23,7 +24,7 @@ public class JSONObject {
         this.hashtable = hashtable;
     }
 
-    public static Hashtable<String, Object> readObject(Cursor cursor) /**/{
+    public static Hashtable<String, Object> readObject(Cursor cursor) {
         int beginCursor = cursor.currentIndex();
         Hashtable<String, Object> table = new Hashtable<>();
         boolean readingValue = false;
@@ -34,9 +35,9 @@ public class JSONObject {
             switch (ch) {
                 case '"':
                     if (!readingValue) {
-                        currentKey = readStringValue(cursor.increment());
+                        currentKey = readStringValueUnescaped(cursor.increment());
                     } else {
-                        String value = readStringValue(cursor.increment());
+                        StringType value = readStringValue(cursor.increment());
                         table.put(currentKey, value);
                         readingValue = false;
                         currentKey = null;
@@ -169,8 +170,19 @@ public class JSONObject {
         }
     }
 
-    public static String readStringValue(Cursor cursor) {
+    public static StringType readStringValue(Cursor cursor) {
         int beginIndex = cursor.currentIndex();
+        followString(cursor);
+        return new StringType(new String(cursor.chars, beginIndex, cursor.currentIndex() - beginIndex));
+    }
+
+    public static String readStringValueUnescaped(Cursor cursor) {
+        int beginIndex = cursor.currentIndex();
+        followString(cursor);
+        return escaper.unescape(cursor.chars, beginIndex, cursor.currentIndex());
+    }
+
+    private static void followString(Cursor cursor) {
         while (cursor.hasNextChar()) {
             char ch = cursor.currentCharacter();
             if (ch == '\\') {
@@ -191,7 +203,6 @@ public class JSONObject {
             }
             cursor.increment();
         }
-        return escaper.unescape(cursor.chars, beginIndex, cursor.currentIndex());
     }
 
     public static String stringifyEscaping(String s) {
@@ -216,8 +227,10 @@ public class JSONObject {
             }
             Object value = hashtable.get(key);
             stringBuilder.append('"').append(stringifyEscaping(key)).append('"').append(':');
-            if (value instanceof String) {
-                stringBuilder.append('"').append(stringifyEscaping(value.toString())).append('"');
+            if (value instanceof StringType) {
+                stringBuilder.append('"').append(((StringType) value).getContentEscaped(escaper)).append('"');
+            } else if (value instanceof String) {
+                stringBuilder.append('"').append(escaper.escape((String) value)).append('"');
             } else if (value == NULL) {
                 stringBuilder.append("null");
             } else {
@@ -236,7 +249,7 @@ public class JSONObject {
     public String getString(String key) {
         Object object = hashtable.get(key);
         if (object == NULL) return null;
-        return (String) object;
+        return ((StringType) object).getContentUnescaped(escaper);
     }
 
     public int getInt(String key) {

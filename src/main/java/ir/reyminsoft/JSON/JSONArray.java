@@ -117,7 +117,10 @@ public class JSONArray {
             } else {
                 first = false;
             }
-            if (o instanceof String) {
+            if (o instanceof StringType) {
+                StringType stringType = ((StringType) o);
+                stringBuilder.append('"').append(stringType.getContentEscaped(escaper)).append('"');
+            }else if (o instanceof String) {
                 stringBuilder.append('"').append(escaper.escape((String) o)).append('"');
             } else if (o == JSONObject.NULL) {
                 stringBuilder.append("null");
@@ -134,8 +137,8 @@ public class JSONArray {
     }
 
     public String getString(int i) {
-        Object o = objectList.get(i);
-        return (String) o;
+        StringType o = (StringType) objectList.get(i);
+        return o.getContentUnescaped(escaper);
     }
 
     public int getInteger(int i) {
