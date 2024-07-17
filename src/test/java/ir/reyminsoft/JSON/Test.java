@@ -129,6 +129,25 @@ public class Test implements TestClass {
     }
 
 
+    @ThisTestOnly
+    public static void escaper_tests() {
+        for (int x = 0; x != 10000; x++) {
+            String random = randomString();
+            String escaped = JSONObject.stringifyEscaping(random);
+            String deEscaped = JSONObject.stringifyDeEscaping(escaped);
+            if (!Utils.equals(deEscaped, random)) {
+                Utils.print("\n----------------------------------------");
+                Utils.print(random);
+                Utils.print("\n----------------------------------------");
+                Utils.print(escaped);
+                Utils.print("\n----------------------------------------");
+                Utils.print(deEscaped);
+                Utils.print("\n----------------------------------------");
+            }
+            assertEquals(deEscaped, random);
+        }
+    }
+
     public static String randomString() {
         StringBuilder str = new StringBuilder();
         String array = "{}\"\\(),.:#@!/-=[]abcdefghijklmnopqrstuvwxyz1234567890\n\r\t\b\f";
