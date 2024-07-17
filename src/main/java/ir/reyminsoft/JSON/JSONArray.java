@@ -4,7 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JSONArray {
-    List<Object> objectList;
+    private final List<Object> objectList;
+
+    private static final Escaper escaper;
+
+    static {
+        escaper = new Escaper('\\');
+        escaper.addCharToEscape('[', ']', '\"', ',', ':', '\t', '\b', '\t', '\f', '\n', '\r');
+    }
 
     public JSONArray(List<Object> objectList) {
         this.objectList = objectList;
@@ -111,7 +118,7 @@ public class JSONArray {
                 first = false;
             }
             if (o instanceof String) {
-                stringBuilder.append('"').append(o).append('"');
+                stringBuilder.append('"').append(escaper.escape((String) o)).append('"');
             } else if (o == JSONObject.NULL) {
                 stringBuilder.append("null");
             } else {

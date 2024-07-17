@@ -5,12 +5,11 @@ import java.util.Stack;
 
 public class JSONObject {
 
-    public static final Escaper escaper;
+    private static final Escaper escaper;
 
     static {
         escaper = new Escaper('\\');
-        escaper.addCharToEscape('{', '}', '\"', ',', ':', '\t', '\b', '\t', '\f', '\n', '\r'
-                , '[', ']');
+        escaper.addCharToEscape('{', '}', '\"', ',', ':', '\t', '\b', '\t', '\f', '\n', '\r');
     }
 
     public static final Object NULL = new Object();
