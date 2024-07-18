@@ -1,3 +1,4 @@
 /.idea/
 /.gradle/
 /build/
+/src/test/java/ir/reyminsoft/JSON/benchmarking/large-file.json
