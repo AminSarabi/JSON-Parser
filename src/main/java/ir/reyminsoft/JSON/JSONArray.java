@@ -18,8 +18,7 @@ public class JSONArray {
     }
 
     public JSONArray(String string) {
-        char[] ch = string.toCharArray();
-        this.objectList = readArray(new Cursor(ch));
+        this.objectList = readArray(new Cursor(string));
     }
 
     public static List<Object> readArray(Cursor cursor) {

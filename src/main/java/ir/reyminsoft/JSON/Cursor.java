@@ -1,13 +1,11 @@
 package ir.reyminsoft.JSON;
 
-import java.util.Arrays;
-
 public class Cursor {
     int index;
-    char[] chars;
+    String string;
 
-    public Cursor(char[] chars) {
-        this.chars = chars;
+    public Cursor(String s) {
+        this.string = s; //we reuse the string and avoid creating another char[] array. (memory gain)
     }
 
     public Cursor increment() {
@@ -20,12 +18,20 @@ public class Cursor {
         return this;
     }
 
+    private char charAt(int x) {
+        return string.charAt(x);
+    }
+
+    private int size() {
+        return string.length();
+    }
+
     public char currentCharacter() {
-        return chars[index];
+        return charAt(currentIndex());
     }
 
     public char nextCharacter(int forward) {
-        return chars[index + forward];
+        return charAt(currentIndex() + forward);
     }
 
 
@@ -60,7 +66,7 @@ public class Cursor {
     }
 
     public boolean hasNextChar() {
-        return indexIsLessThan(chars.length);
+        return indexIsLessThan(size());
     }
 
     public boolean hasNextChars(int count) {
@@ -69,7 +75,7 @@ public class Cursor {
 
     public void assertNextChars(int count) {
         if (!hasNextChars(count)) {
-            throw new JSONException("unexpected end of stream at " + chars.length);
+            throw new JSONException("unexpected end of stream at " + size());
         }
     }
 
@@ -78,11 +84,11 @@ public class Cursor {
     }
 
     public String getRangeAsString(int begin, int end) {
-        return new String(Arrays.copyOfRange(chars, begin, end));
+        return string.substring(begin, end);
     }
 
     public String getRangeAsString(int count) {
-        return new String(Arrays.copyOfRange(chars, currentIndex(), currentIndex() + 4));
+        return string.substring(currentIndex(), currentIndex() + 4);
     }
 
     public void throwUnrecognizedCharacter() {

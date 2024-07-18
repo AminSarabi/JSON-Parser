@@ -12,8 +12,7 @@ public class JSONObject {
 
 
     public JSONObject(String jsonString) {
-        Cursor cursor = new Cursor(jsonString.toCharArray());
-        this.hashtable = readObject(cursor);
+        this.hashtable = readObject(new Cursor(jsonString));
     }
 
     public JSONObject() {
@@ -173,7 +172,7 @@ public class JSONObject {
     public static StringType readStringValue(Cursor cursor) {
         int beginIndex = cursor.currentIndex();
         followString(cursor);
-        return new StringType(new String(cursor.chars, beginIndex, cursor.currentIndex() - beginIndex));
+        return new StringType(cursor.getRangeAsString(beginIndex, cursor.currentIndex()));
     }
 
     public static String readStringValueUnescaped(Cursor cursor) {

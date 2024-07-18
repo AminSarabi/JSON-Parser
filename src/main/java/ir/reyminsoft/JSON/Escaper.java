@@ -12,7 +12,18 @@ public class Escaper {
         this.charsToEscape = new HashSet<>();
         this.escapingChar = escapingChar;
         this.charsToEscape.add(escapingChar);
+        //initiate with a big capacity.
+        this.stringBuilder = new StringBuilder(8192);
+        // this does not have that much of memory overhead but shows benefit on big objects.
     }
+
+    public Escaper(char escapingChar, int initialCapacity) {
+        this.charsToEscape = new HashSet<>();
+        this.escapingChar = escapingChar;
+        this.charsToEscape.add(escapingChar);
+        this.stringBuilder = new StringBuilder(initialCapacity);
+    }
+
 
     protected boolean shouldEscape(char ch) {
         return charsToEscape.contains(ch);
@@ -54,8 +65,9 @@ public class Escaper {
     }
 
 
+    StringBuilder stringBuilder;
     public String unescapeHunting(Cursor cursor, char prey) {
-        StringBuilder stringBuilder = new StringBuilder(2000);
+        stringBuilder.setLength(0);
         boolean wasEscaped = false;
         while (cursor.hasNextChar()) {
             if (wasEscaped) {
