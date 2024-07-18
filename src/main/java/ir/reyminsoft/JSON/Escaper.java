@@ -54,28 +54,23 @@ public class Escaper {
     }
 
 
-    char[] second = new char[1000000];
     public String unescapeHunting(Cursor cursor, char prey) {
+        StringBuilder stringBuilder = new StringBuilder(2000);
         boolean wasEscaped = false;
-        int secondIndex = 0;
         while (cursor.hasNextChar()) {
             if (wasEscaped) {
-                second[secondIndex] = replaceWithControl(cursor.currentCharacter());
-                secondIndex++;
-                if (secondIndex >= second.length) break;
+                stringBuilder.append(replaceWithControl(cursor.currentCharacter()));
                 wasEscaped = false;
             } else if (cursor.currentCharacter() == prey) {
                 break;
             } else if (cursor.currentCharacter() == escapingChar) {
                 wasEscaped = true;
             } else {
-                if (secondIndex >= second.length) break;
-                second[secondIndex] = cursor.currentCharacter();
-                secondIndex++;
+                stringBuilder.append(cursor.currentCharacter());
             }
             cursor.increment();
         }
-        return new String(second, 0, secondIndex);
+        return stringBuilder.toString();
     }
 
     public String unescape(char[] chars, int start, int end) {
