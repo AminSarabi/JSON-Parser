@@ -1,6 +1,5 @@
 package ir.reyminsoft.JSON;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -54,42 +53,45 @@ public class Escaper {
         return escape(chars, 0, chars.length);
     }
 
+
+    char[] second = new char[1000000];
+    public String unescapeHunting(Cursor cursor, char prey) {
+        boolean wasEscaped = false;
+        int secondIndex = 0;
+        while (cursor.hasNextChar()) {
+            if (wasEscaped) {
+                second[secondIndex] = replaceWithControl(cursor.currentCharacter());
+                secondIndex++;
+                if (secondIndex >= second.length) break;
+                wasEscaped = false;
+            } else if (cursor.currentCharacter() == prey) {
+                break;
+            } else if (cursor.currentCharacter() == escapingChar) {
+                wasEscaped = true;
+            } else {
+                if (secondIndex >= second.length) break;
+                second[secondIndex] = cursor.currentCharacter();
+                secondIndex++;
+            }
+            cursor.increment();
+        }
+        return new String(second, 0, secondIndex);
+    }
+
     public String unescape(char[] chars, int start, int end) {
         char[] second = new char[end - start];
-        int firstEscapeChar = 0;
+        boolean wasEscaped = false;
         int secondIndex = 0;
         for (int x = start; x != end; x++) {
+            if (wasEscaped) {
+                second[secondIndex] = replaceWithControl(chars[x]);
+                secondIndex++;
+                if (secondIndex >= second.length) break;
+                wasEscaped = false;
+                continue;
+            }
             if (chars[x] == escapingChar) {
-                boolean first = false;
-                boolean last = false;
-                if (x == 0) first = true;
-                else if (chars[x - 1] != escapingChar) first = true;
-                if (x + 1 == end) last = true;
-                else if (chars[x + 1] != escapingChar) last = true;
-                if (first && last) {
-                    char next = chars[x + 1];
-                    char replacement = replaceWithControl(next);
-                    if (replacement == next && !shouldEscape(next))
-                        throw new RuntimeException("char at " + x + " is a single escaping character." + " " + new String(Arrays.copyOfRange(chars, x - 5, x + 5)));
-                }
-                if (first) {
-                    firstEscapeChar = x;
-                }
-                if (last) {
-                    int count = x - firstEscapeChar + 1;
-                    int countToKeep = count / 2;
-                    for (int k = 0; k != countToKeep; k++) {
-                        second[secondIndex] = escapingChar;
-                        secondIndex++;
-                    }
-                    if (count % 2 == 0) continue;
-                    if (secondIndex >= second.length) break;
-                    x++; //move to the next character which is the escaped character.
-                    if (x >= end) break;
-                    second[secondIndex] = replaceWithControl(chars[x]);
-                    secondIndex++;
-                }
-
+                wasEscaped = true;
             } else {
                 if (secondIndex >= second.length) break;
                 second[secondIndex] = chars[x];

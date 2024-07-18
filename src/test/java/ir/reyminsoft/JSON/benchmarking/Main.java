@@ -12,7 +12,12 @@ public class Main {
 
         BenchmarkTool.benchmark(() -> {
             JSONArray jsonArray = new JSONArray(text);
-        }, 30);
+        }, 30); //result: 17
+
+        /*BenchmarkTool.benchmark(() -> {
+            JSONArray jsonArray = new JSONArray(text);
+            jsonArray.toString();
+        }, 30);*/
 
     }
 }

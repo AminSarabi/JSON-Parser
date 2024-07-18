@@ -109,7 +109,13 @@ public class JSONArray {
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder("[");
+        StringBuilder stringBuilder = new StringBuilder();
+        toString(stringBuilder);
+        return stringBuilder.toString();
+    }
+
+    public void toString(StringBuilder stringBuilder) {
+        stringBuilder.append("[");
         boolean first = true;
         for (Object o : objectList) {
             if (!first) {
@@ -117,18 +123,21 @@ public class JSONArray {
             } else {
                 first = false;
             }
-            if (o instanceof StringType) {
-                StringType stringType = ((StringType) o);
+            if (o instanceof StringType stringType) {
                 stringBuilder.append('"').append(stringType.getContentEscaped(escaper)).append('"');
-            }else if (o instanceof String) {
+            } else if (o instanceof String) {
                 stringBuilder.append('"').append(escaper.escape((String) o)).append('"');
             } else if (o == JSONObject.NULL) {
                 stringBuilder.append("null");
+            } else if (o instanceof JSONObject) {
+                ((JSONObject) o).toString(stringBuilder);
+            } else if (o instanceof JSONArray) {
+                ((JSONArray) o).toString(stringBuilder);
             } else {
                 stringBuilder.append(o.toString());
             }
         }
-        return stringBuilder.append("]").toString();
+        stringBuilder.append("]");
     }
 
     public JSONArray getJSONArray(int i) {
@@ -137,8 +146,10 @@ public class JSONArray {
     }
 
     public String getString(int i) {
-        StringType o = (StringType) objectList.get(i);
-        return o.getContentUnescaped(escaper);
+        Object o = objectList.get(i);
+        if (o instanceof String) return (String) o;
+        StringType stringType = (StringType) o;
+        return stringType.getContentUnescaped(escaper);
     }
 
     public int getInteger(int i) {

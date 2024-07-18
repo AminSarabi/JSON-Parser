@@ -177,9 +177,7 @@ public class JSONObject {
     }
 
     public static String readStringValueUnescaped(Cursor cursor) {
-        int beginIndex = cursor.currentIndex();
-        followString(cursor);
-        return escaper.unescape(cursor.chars, beginIndex, cursor.currentIndex());
+        return escaper.unescapeHunting(cursor, '"');
     }
 
     private static void followString(Cursor cursor) {
@@ -216,7 +214,12 @@ public class JSONObject {
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
+        toString(builder);
+        return builder.toString();
+    }
+
+    public void toString(StringBuilder stringBuilder) {
         stringBuilder.append("{");
         boolean first = true;
         for (String key : hashtable.keySet()) {
@@ -233,12 +236,15 @@ public class JSONObject {
                 stringBuilder.append('"').append(escaper.escape((String) value)).append('"');
             } else if (value == NULL) {
                 stringBuilder.append("null");
+            } else if (value instanceof JSONObject) {
+                ((JSONObject) value).toString(stringBuilder);
+            } else if (value instanceof JSONArray) {
+                ((JSONArray) value).toString(stringBuilder);
             } else {
                 stringBuilder.append(value.toString());
             }
         }
         stringBuilder.append("}");
-        return stringBuilder.toString();
     }
 
     public JSONObject getJSONObject(String key) {
