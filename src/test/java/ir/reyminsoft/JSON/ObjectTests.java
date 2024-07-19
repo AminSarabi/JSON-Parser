@@ -130,7 +130,6 @@ public class ObjectTests implements TestClass {
     }
 
 
-
     public static String randomString() {
         StringBuilder str = new StringBuilder();
         String array = "{}\"\\(),.:#@!/-=[]abcdefghijklmnopqrstuvwxyz1234567890\n\r\t\b\f";

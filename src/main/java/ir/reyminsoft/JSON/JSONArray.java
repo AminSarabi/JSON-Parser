@@ -1,19 +1,25 @@
 package ir.reyminsoft.JSON;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 public class JSONArray {
-    private final List<Object> objectList;
-
     private static final Escaper escaper;
 
+
+
     static {
-        escaper = new Escaper('\\');
-        escaper.addCharToEscape('[', ']', '\"', ',', ':', '\t', '\b', '\t', '\f', '\n', '\r');
+        escaper = new ArrayEscaper();
     }
 
-    public JSONArray(List<Object> objectList) {
+    private final List<Object> objectList;
+
+    public JSONArray() {
+        this.objectList = new ArrayList<>();
+    }
+
+    JSONArray(List<Object> objectList) {
         this.objectList = objectList;
     }
 
@@ -21,7 +27,7 @@ public class JSONArray {
         this.objectList = readArray(new Cursor(string));
     }
 
-    public static List<Object> readArray(Cursor cursor) {
+    static List<Object> readArray(Cursor cursor) {
         int beginIndex = cursor.currentIndex();
         List<Object> list = new ArrayList<>();
         while (cursor.hasNextChar()) {
@@ -83,7 +89,7 @@ public class JSONArray {
         return list;
     }
 
-    public static Object readNumeric(Cursor cursor) {
+    private static Object readNumeric(Cursor cursor) {
         int beginIndex = cursor.currentIndex();
         int endIndex = -1;
         while (cursor.hasNextChar()) {
@@ -107,13 +113,14 @@ public class JSONArray {
     }
 
     @Override
-    public String toString() {
+    public String toString() { //todo if the content is not modified, use a cached string (weak reference)
         StringBuilder stringBuilder = new StringBuilder();
         toString(stringBuilder);
-        return stringBuilder.toString();
+        String str = stringBuilder.toString();
+        return str;
     }
 
-    public void toString(StringBuilder stringBuilder) {
+    void toString(StringBuilder stringBuilder) {
         stringBuilder.append("[");
         boolean first = true;
         for (Object o : objectList) {
@@ -122,8 +129,8 @@ public class JSONArray {
             } else {
                 first = false;
             }
-            if (o instanceof StringType stringType) {
-                stringBuilder.append('"').append(stringType.getContentEscaped(escaper)).append('"');
+            if (o instanceof Escapable escapable) {
+                stringBuilder.append('"').append(escapable.getContentEscaped(escaper)).append('"');
             } else if (o instanceof String) {
                 stringBuilder.append('"').append(escaper.escape((String) o)).append('"');
             } else if (o == JSONObject.NULL) {
@@ -139,25 +146,52 @@ public class JSONArray {
         stringBuilder.append("]");
     }
 
+    public void put(Object o) {
+        if (o == null) throw new JSONException("putting null in json-array. if intended, use JSONObject.NULL instead");
+        if (!(o instanceof String || o instanceof Integer || o instanceof Double ||
+                o instanceof Boolean || o instanceof JSONArray
+                || o instanceof JSONObject || o == JSONObject.NULL)) {
+            throw new JSONException("unknown type to put in json-array: " + o.getClass());
+        }
+        this.objectList.add(o);
+    }
+
     public JSONArray getJSONArray(int i) {
-        Object o = objectList.get(i);
-        return (JSONArray) o;
+        return get(i);
+    }
+
+    public JSONObject getJSONObject(int i) {
+        return get(i);
     }
 
     public String getString(int i) {
         Object o = objectList.get(i);
         if (o instanceof String) return (String) o;
-        StringType stringType = (StringType) o;
-        return stringType.getContentUnescaped(escaper);
+        Escapable escapable = (Escapable) o;
+        return escapable.getContentUnescaped(escaper);
+    }
+
+    public boolean getBoolean(int i) {
+        return get(i);
     }
 
     public int getInteger(int i) {
-        Object o = objectList.get(i);
-        return (int) o;
+        if (i >= objectList.size() || i < 0) return 0;
+        return get(i);
     }
 
     public double getDouble(int i) {
         Object o = objectList.get(i);
         return (double) o;
+    }
+
+    public <T> T get(int i) {
+        if (i >= objectList.size() || i < 0) return null;
+        Object o = objectList.get(i);
+        if (o == null || o == JSONObject.NULL) return null;
+        if (o instanceof Escapable) {
+            return (T) ((Escapable) o).getContentUnescaped(escaper);
+        }
+        return (T) o;
     }
 }

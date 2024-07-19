@@ -3,12 +3,13 @@ package ir.reyminsoft.JSON;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Escaper {
+class Escaper {
 
     HashSet<Character> charsToEscape;
     char escapingChar;
+    StringBuilder stringBuilder;
 
-    public Escaper(char escapingChar) {
+    Escaper(char escapingChar) {
         this.charsToEscape = new HashSet<>();
         this.escapingChar = escapingChar;
         this.charsToEscape.add(escapingChar);
@@ -17,27 +18,27 @@ public class Escaper {
         // this does not have that much of memory overhead but shows benefit on big objects.
     }
 
-    public Escaper(char escapingChar, int initialCapacity) {
+
+    Escaper(char escapingChar, int initialCapacity) {
         this.charsToEscape = new HashSet<>();
         this.escapingChar = escapingChar;
         this.charsToEscape.add(escapingChar);
         this.stringBuilder = new StringBuilder(initialCapacity);
     }
 
-
     protected boolean shouldEscape(char ch) {
         return charsToEscape.contains(ch);
     }
 
-    public void addCharToEscape(char ch) {
+    void addCharToEscape(char ch) {
         this.charsToEscape.add(ch);
     }
 
-    public void addCharToEscape(char... chars) {
+    void addCharToEscape(char... chars) {
         for (char ch : chars) addCharToEscape(ch);
     }
 
-    public char[] escape(char[] chars, int start, int end) {
+    char[] escape(char[] chars, int start, int end) {
         Set<Integer> positions = new HashSet<>();
         for (int x = start; x != end; x++) {
             char ch = chars[x];
@@ -60,13 +61,11 @@ public class Escaper {
         return second;
     }
 
-    public char[] escape(char[] chars) {
+    char[] escape(char[] chars) {
         return escape(chars, 0, chars.length);
     }
 
-
-    StringBuilder stringBuilder;
-    public String unescapeHunting(Cursor cursor, char prey) {
+    String unescapeHunting(Cursor cursor, char prey) {
         stringBuilder.setLength(0);
         boolean wasEscaped = false;
         while (cursor.hasNextChar()) {
@@ -85,7 +84,7 @@ public class Escaper {
         return stringBuilder.toString();
     }
 
-    public String unescape(char[] chars, int start, int end) {
+    String unescape(char[] chars, int start, int end) {
         char[] second = new char[end - start];
         boolean wasEscaped = false;
         int secondIndex = 0;
@@ -108,15 +107,15 @@ public class Escaper {
         return new String(second, 0, secondIndex);
     }
 
-    public String unescape(char[] chars) {
+    String unescape(char[] chars) {
         return unescape(chars, 0, chars.length);
     }
 
-    public String escape(String str) {
+    String escape(String str) {
         return new String(escape(str.toCharArray()));
     }
 
-    public String unescape(String str) {
+    String unescape(String str) {
         return unescape(str.toCharArray());
     }
 

@@ -44,7 +44,7 @@ public class EscaperTests implements TestClass {
 
     }
 
-    public static void extreme_case(){
+    public static void extreme_case() {
         Escaper escaper = new Escaper('\\');
         escaper.addCharToEscape('{', '}', '\"', ',', ':', '\t', '\b', '\t', '\f', '\n', '\r'
                 , '[', ']');
@@ -62,19 +62,19 @@ public class EscaperTests implements TestClass {
     }
 
 
-    public static void control_characters(){
+    public static void control_characters() {
         Escaper escaper = new Escaper('\\');
         char[] chars = new char[]{'\t', '\b', '\t', '\f', '\n', '\r'};
         escaper.addCharToEscape(chars);
         String[] strings = new String[]{
-            "\\n\n\\n\r\n",
+                "\\n\n\\n\r\n",
                 "\b \\b hi there i am \n testing"
         };
         for (String original : strings) {
             Utils.print(original);
             String escaped = escaper.escape(original);
-            for (char ch :chars){
-                TestClassRunner.assertEquals(escaped.contains(Character.toString(ch)),false);
+            for (char ch : chars) {
+                TestClassRunner.assertEquals(escaped.contains(Character.toString(ch)), false);
             }
         }
     }

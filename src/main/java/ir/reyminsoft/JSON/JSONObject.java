@@ -3,11 +3,11 @@ package ir.reyminsoft.JSON;
 import java.util.Hashtable;
 import java.util.Stack;
 
-public class JSONObject {
+class JSONObject {
 
-    protected static final JSONEscaper escaper = new JSONEscaper();
+    protected static final ObjectEscaper escaper = new ObjectEscaper();
 
-    public static final Object NULL = new Object();
+    static final Object NULL = new Object();
     private final Hashtable<String, Object> hashtable;
 
 
@@ -15,15 +15,15 @@ public class JSONObject {
         this.hashtable = readObject(new Cursor(jsonString));
     }
 
-    public JSONObject() {
+    JSONObject() {
         this.hashtable = new Hashtable<>();
     }
 
-    public JSONObject(Hashtable<String, Object> hashtable) {
+    JSONObject(Hashtable<String, Object> hashtable) {
         this.hashtable = hashtable;
     }
 
-    public static Hashtable<String, Object> readObject(Cursor cursor) {
+    static Hashtable<String, Object> readObject(Cursor cursor) {
         int beginCursor = cursor.currentIndex();
         Hashtable<String, Object> table = new Hashtable<>();
         boolean readingValue = false;
@@ -36,7 +36,7 @@ public class JSONObject {
                     if (!readingValue) {
                         currentKey = readStringValueUnescaped(cursor.increment());
                     } else {
-                        StringType value = readStringValue(cursor.increment());
+                        Escapable value = readStringValue(cursor.increment());
                         table.put(currentKey, value);
                         readingValue = false;
                         currentKey = null;
@@ -134,7 +134,7 @@ public class JSONObject {
         return table;
     }
 
-    public static boolean readBoolean(Cursor cursor) {
+    static boolean readBoolean(Cursor cursor) {
         char first = cursor.currentCharacter();
         int count = 0;
         if (first == 't') {
@@ -146,7 +146,7 @@ public class JSONObject {
         return Boolean.parseBoolean(cursor.getRangeAsString(count));
     }
 
-    public static Object readNumeric(Cursor cursor) {
+    static Object readNumeric(Cursor cursor) {
         int beginIndex = cursor.currentIndex(); //we can safely assume that this index is a number.
         int endIndex = -1;
         while (cursor.hasNextChar()) {
@@ -169,13 +169,13 @@ public class JSONObject {
         }
     }
 
-    public static StringType readStringValue(Cursor cursor) {
+    static Escapable readStringValue(Cursor cursor) {
         int beginIndex = cursor.currentIndex();
         followString(cursor);
-        return new StringType(cursor.getRangeAsString(beginIndex, cursor.currentIndex()));
+        return new Escapable(cursor.getRangeAsString(beginIndex, cursor.currentIndex()));
     }
 
-    public static String readStringValueUnescaped(Cursor cursor) {
+    static String readStringValueUnescaped(Cursor cursor) {
         return escaper.unescapeHunting(cursor, '"');
     }
 
@@ -202,23 +202,29 @@ public class JSONObject {
         }
     }
 
-    public static String stringifyEscaping(String s) {
+    static String stringifyEscaping(String s) {
         return escaper.escape(s);
     }
 
 
-    public void put(String key, Object s) {
-        this.hashtable.put(key, s);
+    void put(String key, Object o) {
+        if (o == null) throw new JSONException("putting null in json-object. if intended, use JSONObject.NULL instead");
+        if (!(o instanceof String || o instanceof Integer || o instanceof Double ||
+                o instanceof Boolean || o instanceof JSONArray
+                || o instanceof JSONObject || o == JSONObject.NULL)) {
+            throw new JSONException("unknown type to put in json-object: " + o.getClass());
+        }
+        this.hashtable.put(key, o);
     }
 
     @Override
-    public String toString() {
+    public String toString() { //todo if the content is not modified, use a cached string (weak reference)
         StringBuilder builder = new StringBuilder();
         toString(builder);
         return builder.toString();
     }
 
-    public void toString(StringBuilder stringBuilder) {
+    void toString(StringBuilder stringBuilder) {
         stringBuilder.append("{");
         boolean first = true;
         for (String key : hashtable.keySet()) {
@@ -229,8 +235,8 @@ public class JSONObject {
             }
             Object value = hashtable.get(key);
             stringBuilder.append('"').append(stringifyEscaping(key)).append('"').append(':');
-            if (value instanceof StringType) {
-                stringBuilder.append('"').append(((StringType) value).getContentEscaped(escaper)).append('"');
+            if (value instanceof Escapable) {
+                stringBuilder.append('"').append(((Escapable) value).getContentEscaped(escaper)).append('"');
             } else if (value instanceof String) {
                 stringBuilder.append('"').append(escaper.escape((String) value)).append('"');
             } else if (value == NULL) {
@@ -246,34 +252,38 @@ public class JSONObject {
         stringBuilder.append("}");
     }
 
+
     public JSONObject getJSONObject(String key) {
         Object object = hashtable.get(key);
         return (JSONObject) object;
     }
 
+    public JSONArray getJSONArray(String key) {
+        return get(key);
+    }
+
     public String getString(String key) {
-        Object object = hashtable.get(key);
-        if (object == NULL) return null;
-        return ((StringType) object).getContentUnescaped(escaper);
+        return get(key);
     }
 
     public int getInt(String key) {
-        Object object = hashtable.get(key);
-        return (Integer) object;
+        return get(key);
     }
 
     public double getDouble(String key) {
-        Object object = hashtable.get(key);
-        return (Double) object;
+        return get(key);
     }
 
     public boolean getBoolean(String key) {
-        Object object = hashtable.get(key);
-        return (Boolean) object;
+        return get(key);
     }
 
     public <T> T get(String key) {
         Object object = hashtable.get(key);
+        if (object == null || object == NULL) return null;
+        if (object instanceof Escapable) {
+            return (T) ((Escapable) object).getContentUnescaped(escaper);
+        }
         return (T) object;
     }
 

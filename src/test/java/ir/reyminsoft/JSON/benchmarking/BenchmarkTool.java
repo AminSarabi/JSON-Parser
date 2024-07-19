@@ -40,11 +40,11 @@ public class BenchmarkTool {
     }
 
     private static String get(long l) {
-        long ms = l/(1000*1000);
-        l = l %1000*1000;
-        long ns = l/1000;
-        l = l %1000;
-        return ms+"."+ns;
+        long ms = l / (1000 * 1000);
+        l = l % 1000 * 1000;
+        long ns = l / 1000;
+        l = l % 1000;
+        return ms + "." + ns;
     }
 
     private static Object[] perform_standard() {

@@ -1,11 +1,11 @@
 package ir.reyminsoft.JSON;
 
-public class StringType {
+public class Escapable {
 
     String content;
     boolean isUnescaped = false;
 
-    public StringType(String content) {
+    public Escapable(String content) {
         this.content = content;
     }
 
@@ -15,6 +15,7 @@ public class StringType {
         }
         return content;
     }
+
     public String getContentUnescaped(Escaper escaper) {
         if (!isUnescaped) {
             content = escaper.unescape(content);

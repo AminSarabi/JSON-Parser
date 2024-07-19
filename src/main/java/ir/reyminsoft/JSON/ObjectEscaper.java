@@ -1,8 +1,8 @@
 package ir.reyminsoft.JSON;
 
-public class JSONEscaper extends Escaper {
+public class ObjectEscaper extends Escaper {
 
-    public JSONEscaper() {
+    public ObjectEscaper() {
         super('\\');
     }
 

@@ -15,7 +15,7 @@ public class Utils {
         System.out.println(stringBuilder);
     }
 
-    protected static boolean equals(Object o, Object o2) {
+    static boolean equals(Object o, Object o2) {
         if (o == o2) return true;
         if (o2 == null) return false;
         if (o == null) return false;
@@ -36,7 +36,7 @@ public class Utils {
         return o.equals(o2);
     }
 
-    protected static String stringify(Object o) {
+    static String stringify(Object o) {
         if (o == null) return null;
         if (o.getClass().isArray()) {
             if (o instanceof int[]) return Arrays.toString((int[]) o);
@@ -51,18 +51,18 @@ public class Utils {
         return o.toString();
     }
 
-    protected static String twoDigitAtLeast(int value) {
+    static String twoDigitAtLeast(int value) {
         if (value < 10) return "0" + value;
         return String.valueOf(value);
     }
 
-    protected static String threeDigitAtLeast(int value) {
+    static String threeDigitAtLeast(int value) {
         if (value < 10) return "00" + value;
         if (value < 100) return "0" + value;
         return String.valueOf(value);
     }
 
-    protected static String fourDigitAtLeast(int value) {
+    static String fourDigitAtLeast(int value) {
         if (value < 10) return "0" + value;
         if (value < 100) return "00" + value;
         if (value < 1000) return "000" + value;
