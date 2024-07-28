@@ -108,7 +108,6 @@ public class ObjectTests implements TestClass {
     }
 
 
-    @ThisTestOnly
     public static void parses_array() {
         String str = "{\"a\":[7091,\"amin\",{\"code\":7091}]}";
         JSONObject object = new JSONObject(str);

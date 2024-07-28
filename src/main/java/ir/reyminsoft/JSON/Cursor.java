@@ -13,16 +13,27 @@ class Cursor {
         return this;
     }
 
+    boolean incrementAndHasNext() {
+        if (index + 1 >= size()) return false;
+        index++;
+        return true;
+    }
+
+    Cursor increment(int count) {
+        index += count;
+        return this;
+    }
+
     Cursor decrement() {
         index--;
         return this;
     }
 
-    private char charAt(int x) {
+    char charAt(int x) {
         return string.charAt(x);
     }
 
-    private int size() {
+    int size() {
         return string.length();
     }
 

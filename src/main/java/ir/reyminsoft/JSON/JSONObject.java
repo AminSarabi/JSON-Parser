@@ -1,7 +1,6 @@
 package ir.reyminsoft.JSON;
 
 import java.util.Hashtable;
-import java.util.Stack;
 
 class JSONObject {
 
@@ -11,6 +10,7 @@ class JSONObject {
     private final Hashtable<String, Object> hashtable;
 
 
+    int cachedStringLength = 128;
     public JSONObject(String jsonString) {
         this.hashtable = readObject(new Cursor(jsonString));
     }
@@ -23,21 +23,21 @@ class JSONObject {
         this.hashtable = hashtable;
     }
 
-    static Hashtable<String, Object> readObject(Cursor cursor) {
+    static Hashtable<String, Object> readObject(Cursor cursor, int openBracesCount) {
         int beginCursor = cursor.currentIndex();
         Hashtable<String, Object> table = new Hashtable<>();
         boolean readingValue = false;
-        int openBracesCount = 0;
         String currentKey = null;
         while (cursor.hasNextChar()) {
             char ch = cursor.currentCharacter();
+            int characterIndex = cursor.currentIndex();
+            cursor.increment();
             switch (ch) {
                 case '"':
                     if (!readingValue) {
-                        currentKey = readStringValueUnescaped(cursor.increment());
+                        currentKey = readStringValueUnescaped(cursor);
                     } else {
-                        Escapable value = readStringValue(cursor.increment());
-                        table.put(currentKey, value);
+                        table.put(currentKey, readStringValue(cursor));
                         readingValue = false;
                         currentKey = null;
                     }
@@ -55,39 +55,70 @@ class JSONObject {
                 case '8':
                 case '9':
                     if (readingValue) {
-                        Object value = readNumeric(cursor);
+                        Object value;
+                        boolean end = false;
+                        int beginIndex = cursor.currentIndex(); //we can safely assume that this index is a number.
+                        int endIndex = -1;
+                        while (cursor.hasNextChar()) {
+                            ch = cursor.currentCharacter();
+                            if (Character.isWhitespace(ch)) {
+                                endIndex = cursor.currentIndex();
+                                break;
+                            } else if (ch == ',') {
+                                endIndex = cursor.currentIndex();
+                                break;
+                            } else if (ch == '}') {
+                                end = true;
+                                endIndex = cursor.currentIndex();
+                                break;
+                            }
+                            cursor.increment();
+                        }
+                        String str = cursor.getRangeAsString(beginIndex - 1, endIndex);
+                        if (str.contains(".")) {
+                            value = Double.parseDouble(str);
+                        } else {
+                            value = Integer.parseInt(str);
+                        }
                         table.put(currentKey, value);
+                        if (end) return table;
                         readingValue = false;
                         currentKey = null;
                     } else {
-                        throw new JSONException("unexpected character '" + ch + "' at " + cursor.currentIndex());
+                        throw new JSONException("unexpected character '" + ch + "' at " + characterIndex);
                     }
                     break;
                 case 't':
-                case 'f':
+                case 'T':
                     if (readingValue) {
-                        Object value = readBoolean(cursor);
-                        table.put(currentKey, value);
-                        readingValue = false;
+                        table.put(currentKey, true);
+                        cursor.increment(3);  //todo here we assume that the value is true. throw exception if not.
                         currentKey = null;
+                        readingValue = false;
+                        break;
                     } else {
-                        throw new JSONException("unexpected character '" + ch + "' at " + cursor.currentIndex());
+                        throw new JSONException("unexpected character '" + ch + "' at " + characterIndex);
                     }
-                    break;
+                case 'f':
+                case 'F':
+                    if (readingValue) {
+                        table.put(currentKey, false);
+                        cursor.increment(4); //todo here we assume that the value is true. throw exception if not.
+                        currentKey = null;
+                        readingValue = false;
+                        break;
+                    } else {
+                        throw new JSONException("unexpected character '" + ch + "' at " + characterIndex);
+                    }
                 case 'n':
                 case 'N':
                     if (readingValue) {
-                        cursor.assertNextChars(4);
-                        String str = cursor.getRangeAsString(4);
-                        if (str.equalsIgnoreCase("null")) {
-                            table.put(currentKey, NULL);
-                            readingValue = false;
-                            currentKey = null;
-                        } else {
-                            throw new JSONException("unrecognized value : " + str);
-                        }
+                        table.put(currentKey, NULL);
+                        cursor.increment(3);
+                        readingValue = false;
+                        currentKey = null;
                     } else {
-                        throw new JSONException("unexpected character '" + ch + "' at " + cursor.currentIndex());
+                        throw new JSONException("unexpected character '" + ch + "' at " + characterIndex);
                     }
                 case ',':
                     break;
@@ -95,10 +126,10 @@ class JSONObject {
                     readingValue = true;
                     break;
                 case '{':
-                    if (cursor.currentIndex() != beginCursor && openBracesCount==0)
-                        throw new JSONException("independent brace opening at " + cursor);
+                    if (characterIndex != beginCursor && openBracesCount == 0)
+                        throw new JSONException("independent brace opening at " + characterIndex);
                     if (currentKey != null) {
-                        table.put(currentKey, new JSONObject(readObject(cursor)));
+                        table.put(currentKey, new JSONObject(readObject(cursor, 1)));
                         currentKey = null;
                         readingValue = false;
                         break;
@@ -106,15 +137,15 @@ class JSONObject {
                     openBracesCount++;
                     break;
                 case '}':
-                    if (openBracesCount==0)
-                        throw new JSONException("} at position " + cursor + " closes nothing.");
-                    if (--openBracesCount==0) {
+                    if (openBracesCount == 0)
+                        throw new JSONException("} at position " + cursor.currentIndex() + " closes nothing.");
+                    if (--openBracesCount == 0) {
                         if (beginCursor != 0) return table;
                     }
                     break;
 
                 case '[':
-                    if (openBracesCount==0) {
+                    if (openBracesCount == 0) {
                         throw new JSONException("this is a json array.");
                     }
                     if (readingValue) {
@@ -122,58 +153,26 @@ class JSONObject {
                         readingValue = false;
                         currentKey = null;
                     } else {
-                        throw new JSONException("unexpected character '" + ch + "' at " + cursor.currentIndex());
+                        throw new JSONException("unexpected character '" + ch + "' at " + characterIndex);
                     }
                     break;
 
-            }/**/
-            cursor.increment();
+            }
         }
-        if (openBracesCount!=0) {
+        if (openBracesCount != 0) {
             throw new JSONException(openBracesCount + " open braces were never closed in this json string");
         }
         return table;
     }
 
-    static boolean readBoolean(Cursor cursor) {
-        char first = cursor.currentCharacter();
-        int count = 0;
-        if (first == 't') {
-            count = 4;
-        } else if (first == 'f') {
-            count = 5;
-        } else cursor.throwUnrecognizedCharacter();
-        cursor.assertNextChars(count);
-        return Boolean.parseBoolean(cursor.getRangeAsString(count));
-    }
-
-    static Object readNumeric(Cursor cursor) {
-        int beginIndex = cursor.currentIndex(); //we can safely assume that this index is a number.
-        int endIndex = -1;
-        while (cursor.hasNextChar()) {
-            char ch = cursor.currentCharacter();
-            if (Character.isWhitespace(ch)) {
-                endIndex = cursor.currentIndex();
-                break;
-            } else if (ch == ',' || ch == '}') {
-                endIndex = cursor.currentIndex();
-                cursor.decrement();
-                break;
-            }
-            cursor.increment();
-        }
-        String str = cursor.getRangeAsString(beginIndex, endIndex);
-        if (str.contains(".")) {
-            return Double.parseDouble(str);
-        } else {
-            return Integer.parseInt(str);
-        }
+    static Hashtable<String, Object> readObject(Cursor cursor) {
+        return readObject(cursor, 0);
     }
 
     static Escapable readStringValue(Cursor cursor) {
         int beginIndex = cursor.currentIndex();
         followString(cursor);
-        return new Escapable(cursor.getRangeAsString(beginIndex, cursor.currentIndex()));
+        return new Escapable(new StringSubString(cursor.string, beginIndex, cursor.currentIndex() - 1));
     }
 
     static String readStringValueUnescaped(Cursor cursor) {
@@ -183,23 +182,19 @@ class JSONObject {
     private static void followString(Cursor cursor) {
         while (cursor.hasNextChar()) {
             char ch = cursor.currentCharacter();
+            cursor.increment();
             if (ch == '\\') {
-                if (cursor.hasNextChars(1)) {
-                    char nextChar = cursor.nextCharacter(1);
-                    if (
-                            nextChar == '"' || nextChar == '\\'
-                    ) {
-                        cursor.increment();
-                        cursor.increment();
-                        continue;
-                    }
+                char nextChar = cursor.currentCharacter();
+                if (
+                        nextChar == '"' || nextChar == '\\'
+                ) {
+                    cursor.increment();
+                    continue;
                 }
-
             }
             if (ch == '"') {
                 break;
             }
-            cursor.increment();
         }
     }
 
@@ -220,7 +215,7 @@ class JSONObject {
 
     @Override
     public String toString() { //todo if the content is not modified, use a cached string (weak reference)
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(cachedStringLength);
         toString(builder);
         return builder.toString();
     }
@@ -237,7 +232,7 @@ class JSONObject {
             Object value = hashtable.get(key);
             stringBuilder.append('"').append(stringifyEscaping(key)).append('"').append(':');
             if (value instanceof Escapable) {
-                stringBuilder.append('"').append(((Escapable) value).getContentEscaped(escaper)).append('"');
+                stringBuilder.append('"').append(((Escapable) value).getContentEscaped()).append('"');
             } else if (value instanceof String) {
                 stringBuilder.append('"').append(escaper.escape((String) value)).append('"');
             } else if (value == NULL) {

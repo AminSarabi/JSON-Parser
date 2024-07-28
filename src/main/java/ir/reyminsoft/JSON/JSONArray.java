@@ -1,12 +1,10 @@
 package ir.reyminsoft.JSON;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 public class JSONArray {
     private static final Escaper escaper;
-
 
 
     static {
@@ -23,49 +21,51 @@ public class JSONArray {
         this.objectList = objectList;
     }
 
+
+    int cachedStringLength = 128;
+
     public JSONArray(String string) {
-        this.objectList = readArray(new Cursor(string));
+        cachedStringLength = string.length();
+        Cursor cursor = new Cursor(string);
+        cursor.assertChar('[');
+        this.objectList = readArray(cursor.increment());
     }
 
     static List<Object> readArray(Cursor cursor) {
-        int beginIndex = cursor.currentIndex();
         List<Object> list = new ArrayList<>();
         while (cursor.hasNextChar()) {
             char ch = cursor.currentCharacter();
+            int characterIndex = cursor.currentIndex();
+            cursor.increment();
             switch (ch) {
                 case ',':
                     break;
                 case '[':
-                    if (cursor.currentIndex() != beginIndex)
-                        list.add(new JSONArray(readArray(cursor)));
+                    list.add(new JSONArray(readArray(cursor)));
                     break;
                 case ']':
-                    if (beginIndex != 0) return list;
-                    break;
+                    return list;
                 case '{':
-                    list.add(new JSONObject(JSONObject.readObject(cursor)));
+                    list.add(new JSONObject(JSONObject.readObject(cursor, 1)));
                     break;
                 case '"':
-                    list.add(JSONObject.readStringValue(cursor.increment()));
+                    list.add(JSONObject.readStringValue(cursor));
                     break;
 
                 case 't':
                 case 'T':
+                    list.add(true);
+                    cursor.increment(3); //todo here we assume that the value is true. throw exception if not.
+                    break;
                 case 'f':
                 case 'F':
-                    list.add(JSONObject.readBoolean(cursor));
+                    list.add(false);
+                    cursor.increment(4);  //todo here we assume that the value is true. throw exception if not.
                     break;
                 case 'n':
                 case 'N':
-                    if (!cursor.hasNextChars(4)) {
-                        throw new JSONException("unexpected end of stream at " + cursor);
-                    }
-                    String str = cursor.getRangeAsString(4);
-                    if (str.equalsIgnoreCase("null")) {
-                        list.add(JSONObject.NULL);
-                    } else {
-                        throw new JSONException("unrecognized value " + str);
-                    }
+                    list.add(JSONObject.NULL);
+                    cursor.increment(3);
                     break;
                 case '+':
                 case '-':
@@ -79,45 +79,46 @@ public class JSONArray {
                 case '7':
                 case '8':
                 case '9':
-                    list.add(readNumeric(cursor));
+                    Object value;
+                    boolean end = false;
+                    int endIndex = -1;
+                    while (cursor.hasNextChar()) {
+                        ch = cursor.currentCharacter();
+                        if (Character.isWhitespace(ch)) {
+                            endIndex = cursor.currentIndex();
+                            break;
+                        } else if (ch == ',') {
+                            endIndex = cursor.currentIndex();
+                            break;
+                        } else if (ch == ']') {
+                            end = true;
+                            endIndex = cursor.currentIndex();
+                            break;
+                        }
+                        cursor.increment();
+                    }
+                    String str = cursor.getRangeAsString(characterIndex, endIndex);
+                    if (str.contains(".")) {
+                        value = Double.parseDouble(str);
+                    } else {
+                        value = Integer.parseInt(str);
+                    }
+                    list.add(value);
+                    if (end) return list;
                     break;
             }
-            cursor.increment();
         }
 
 
         return list;
     }
 
-    private static Object readNumeric(Cursor cursor) {
-        int beginIndex = cursor.currentIndex();
-        int endIndex = -1;
-        while (cursor.hasNextChar()) {
-            char ch = cursor.currentCharacter();
-            if (Character.isWhitespace(ch)) {
-                endIndex = cursor.currentIndex();
-                break;
-            } else if (ch == ',' || ch == ']') {
-                endIndex = cursor.currentIndex();
-                cursor.decrement();
-                break;
-            }
-            cursor.increment();
-        }
-        String str = cursor.getRangeAsString(beginIndex, endIndex);
-        if (str.contains(".")) {
-            return Double.parseDouble(str);
-        } else {
-            return Integer.parseInt(str);
-        }
-    }
 
     @Override
     public String toString() { //todo if the content is not modified, use a cached string (weak reference)
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder(cachedStringLength);
         toString(stringBuilder);
-        String str = stringBuilder.toString();
-        return str;
+        return stringBuilder.toString();
     }
 
     void toString(StringBuilder stringBuilder) {
@@ -130,7 +131,7 @@ public class JSONArray {
                 first = false;
             }
             if (o instanceof Escapable escapable) {
-                stringBuilder.append('"').append(escapable.getContentEscaped(escaper)).append('"');
+                stringBuilder.append('"').append(escapable.getContentEscaped()).append('"');
             } else if (o instanceof String) {
                 stringBuilder.append('"').append(escaper.escape((String) o)).append('"');
             } else if (o == JSONObject.NULL) {
