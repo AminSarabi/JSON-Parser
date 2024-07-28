@@ -2,7 +2,7 @@ package ir.reyminsoft.JSON;
 
 import java.util.Hashtable;
 
-class JSONObject {
+public class JSONObject {
 
     protected static final ObjectEscaper escaper = new ObjectEscaper();
 
@@ -15,7 +15,7 @@ class JSONObject {
         this.hashtable = readObject(new Cursor(jsonString));
     }
 
-    JSONObject() {
+    public JSONObject() {
         this.hashtable = new Hashtable<>();
     }
 

@@ -1,3 +1,16 @@
+import proguard.gradle.ProGuardTask
+
+buildscript {
+    repositories {
+        mavenCentral()
+        google()
+    }
+    dependencies {
+        classpath 'com.guardsquare:proguard-gradle:7.5.0'
+    }
+}
+
+
 plugins {
     id 'java'
 }
@@ -5,20 +18,32 @@ plugins {
 group = 'ir.reyminsoft'
 version = '1.0'
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-
-}
-
-
-jar{
+jar {
     manifest {
         attributes(
                 'Implementation-Title': project.name,
                 'Implementation-Version': project.version,
         )
     }
+}
+
+tasks.register('proguard', ProGuardTask) {
+    if (System.getProperty('java.version').startsWith('1.')) {
+        //Before Java 9, the runtime classes were packaged in a single jar file
+        libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+    } else {
+        //As of Java 9, the runtime classes are packaged in modular jmod files
+        libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+    }
+
+    injars './build/libs/JSON-Parser-1.0.jar'
+    outjars './build/libs/release.jar'
+    renamesourcefileattribute 'SourceFile'
+    keepattributes '*Annotation*'
+
+    keep 'public class * { \
+        public protected *; \
+    }'
+
+
 }
