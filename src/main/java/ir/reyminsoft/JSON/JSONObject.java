@@ -27,7 +27,7 @@ class JSONObject {
         int beginCursor = cursor.currentIndex();
         Hashtable<String, Object> table = new Hashtable<>();
         boolean readingValue = false;
-        Stack<Integer> braces = new Stack<>();
+        int openBracesCount = 0;
         String currentKey = null;
         while (cursor.hasNextChar()) {
             char ch = cursor.currentCharacter();
@@ -93,7 +93,7 @@ class JSONObject {
                     readingValue = true;
                     break;
                 case '{':
-                    if (cursor.currentIndex() != beginCursor && braces.isEmpty())
+                    if (cursor.currentIndex() != beginCursor && openBracesCount==0)
                         throw new JSONException("independent brace opening at " + cursor);
                     if (currentKey != null) {
                         table.put(currentKey, new JSONObject(readObject(cursor)));
@@ -101,19 +101,18 @@ class JSONObject {
                         readingValue = false;
                         break;
                     }
-                    braces.push(cursor.currentIndex());
+                    openBracesCount++;
                     break;
                 case '}':
-                    if (braces.empty())
+                    if (openBracesCount==0)
                         throw new JSONException("} at position " + cursor + " closes nothing.");
-                    braces.pop();
-                    if (braces.isEmpty()) {
+                    if (--openBracesCount==0) {
                         if (beginCursor != 0) return table;
                     }
                     break;
 
                 case '[':
-                    if (braces.isEmpty()) {
+                    if (openBracesCount==0) {
                         throw new JSONException("this is a json array.");
                     }
                     if (readingValue) {
@@ -128,8 +127,8 @@ class JSONObject {
             }/**/
             cursor.increment();
         }
-        if (!braces.empty()) {
-            throw new JSONException("the brace(s) opened at position(s) " + braces + " were never closed.");
+        if (openBracesCount!=0) {
+            throw new JSONException(openBracesCount + " open braces were never closed in this json string");
         }
         return table;
     }
