@@ -2,7 +2,7 @@ package ir.reyminsoft.JSON;
 
 import java.util.Arrays;
 
-public class Utils {
+class Utils {
 
     static void print(Object... args) {
         StringBuilder stringBuilder = new StringBuilder();

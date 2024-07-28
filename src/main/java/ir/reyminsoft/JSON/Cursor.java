@@ -1,6 +1,6 @@
 package ir.reyminsoft.JSON;
 
-public class Cursor {
+class Cursor {
     int index;
     String string;
 

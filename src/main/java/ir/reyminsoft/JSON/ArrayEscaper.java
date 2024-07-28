@@ -1,6 +1,6 @@
 package ir.reyminsoft.JSON;
 
-public class ArrayEscaper extends Escaper {
+class ArrayEscaper extends Escaper {
 
     public ArrayEscaper() {
         super('\\');

@@ -1,6 +1,6 @@
 package ir.reyminsoft.JSON;
 
-public class Escapable {
+class Escapable {
 
     String content;
     boolean isUnescaped = false;
