@@ -2,7 +2,7 @@ package ir.reyminsoft.JSON;
 
 class Escapable {
 
-    CharSequence escapedVersion;
+    final CharSequence escapedVersion;
     CharSequence unescapedVersion;
 
     public Escapable(CharSequence escapedVersion) {

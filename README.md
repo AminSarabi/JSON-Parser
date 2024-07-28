@@ -9,9 +9,9 @@ It works fast and does not trigger the garbage collector, making it suitable for
 This library is **10 times** faster than org.json in parsing **[25 Megabytes](https://github.com/json-iterator/test-data)** of json text:
 
 |     library     | time (ms) |
-|:---------------:|:---:|
-| reyminsoft.json | 046 |
-|    json.org:    | 530 |
+|:---------------:|:---------:|
+| reyminsoft.json |    046    |
+|    json.org:    |    530    |
 
 ---
 

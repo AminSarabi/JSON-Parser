@@ -130,7 +130,8 @@ public class JSONArray {
             } else {
                 first = false;
             }
-            if (o instanceof Escapable escapable) {
+            if (o instanceof Escapable) {
+                Escapable escapable = (Escapable) o;
                 stringBuilder.append('"').append(escapable.getContentEscaped()).append('"');
             } else if (o instanceof String) {
                 stringBuilder.append('"').append(escaper.escape((String) o)).append('"');
@@ -191,8 +192,10 @@ public class JSONArray {
         Object o = objectList.get(i);
         if (o == null || o == JSONObject.NULL) return null;
         if (o instanceof Escapable) {
-            return (T) ((Escapable) o).getContentUnescaped(escaper);
+            o = ((Escapable) o).getContentUnescaped(escaper);
         }
-        return (T) o;
+        @SuppressWarnings("unchecked")
+        T casted = (T) o;
+        return casted;
     }
 }

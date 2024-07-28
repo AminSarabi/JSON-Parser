@@ -2,9 +2,9 @@ package ir.reyminsoft.JSON;
 
 class StringSubString implements CharSequence {
 
-    String string;
-    int start;
-    int end;
+    final String string;
+    final int start;
+    final int end;
 
     public StringSubString(String string, int start, int end) {
         this.string = string;
@@ -22,10 +22,6 @@ class StringSubString implements CharSequence {
         return string.charAt(start + index);
     }
 
-    @Override
-    public boolean isEmpty() {
-        return end - start == 0;
-    }
 
     @Override
     public CharSequence subSequence(int start, int end) {

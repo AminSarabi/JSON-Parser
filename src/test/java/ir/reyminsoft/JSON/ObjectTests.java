@@ -8,7 +8,7 @@ import static ir.reyminsoft.JSON.TestClassRunner.assertEquals;
 
 public class ObjectTests implements TestClass {
 
-    public static Random random = new Random();
+    public static final Random random = new Random();
 
     public static void main(String[] args) {
 
@@ -16,9 +16,6 @@ public class ObjectTests implements TestClass {
 
     }
 
-    public static void parse_parse_empty_json() {
-
-    }
 
     public static void test_create_from_string() {
         String jsonString = "{}";

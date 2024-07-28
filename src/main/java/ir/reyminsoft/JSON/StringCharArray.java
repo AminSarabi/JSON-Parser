@@ -2,9 +2,9 @@ package ir.reyminsoft.JSON;
 
 class StringCharArray implements CharSequence {
 
-    char[] chars;
-    int start;
-    int end;
+    final char[] chars;
+    final int start;
+    final int end;
 
     public StringCharArray(char[] chars, int start, int end) {
         this.chars = chars;
@@ -20,11 +20,6 @@ class StringCharArray implements CharSequence {
     @Override
     public char charAt(int index) {
         return chars[start+index];
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return end - start == 0;
     }
 
     @Override

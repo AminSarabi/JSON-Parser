@@ -8,10 +8,22 @@ class ArrayEscaper extends Escaper {
 
     @Override
     protected boolean shouldEscape(char ch) {
-        return switch (ch) {
-            case '[', ']', '\"', ',', ':', '\t', '\b', '\\', '\f', '\n', '\r' -> true;
-            default -> false;
-        };
+        switch (ch) {
+            case '[':
+            case ']':
+            case '\"':
+            case ',':
+            case ':':
+            case '\t':
+            case '\b':
+            case '\\':
+            case '\f':
+            case '\n':
+            case '\r':
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override

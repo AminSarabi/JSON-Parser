@@ -2,7 +2,7 @@ package ir.reyminsoft.JSON;
 
 class Cursor {
     int index;
-    String string;
+    final String string;
 
     Cursor(String s) {
         this.string = s; //we reuse the string and avoid creating another char[] array. (memory gain)

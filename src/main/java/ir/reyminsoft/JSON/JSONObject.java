@@ -4,13 +4,14 @@ import java.util.Hashtable;
 
 public class JSONObject {
 
-    protected static final ObjectEscaper escaper = new ObjectEscaper();
+    static final ObjectEscaper escaper = new ObjectEscaper();
 
     static final Object NULL = new Object();
     private final Hashtable<String, Object> hashtable;
 
 
-    int cachedStringLength = 128;
+    final int cachedStringLength = 128;
+
     public JSONObject(String jsonString) {
         this.hashtable = readObject(new Cursor(jsonString));
     }
@@ -275,12 +276,14 @@ public class JSONObject {
     }
 
     public <T> T get(String key) {
-        Object object = hashtable.get(key);
-        if (object == null || object == NULL) return null;
-        if (object instanceof Escapable) {
-            return (T) ((Escapable) object).getContentUnescaped(escaper);
+        Object o = hashtable.get(key);
+        if (o == null || o == NULL) return null;
+        if (o instanceof Escapable) {
+            o = ((Escapable) o).getContentUnescaped(escaper);
         }
-        return (T) object;
+        @SuppressWarnings("unchecked")
+        T casted = (T) o;
+        return casted;
     }
 
 

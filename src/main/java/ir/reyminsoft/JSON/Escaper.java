@@ -7,7 +7,7 @@ import java.util.Set;
 class Escaper {
 
     HashSet<Character> charsToEscape;
-    char escapingChar;
+    final char escapingChar;
 
     Escaper(char escapingChar) {
         this.escapingChar = escapingChar;
@@ -165,27 +165,41 @@ class Escaper {
     }
 
     private char handleControlChar(char ch) {
-        return switch (ch) {
-            case '\n' -> 'n';
-            case '\t' -> 't';
-            case '\b' -> 'b';
-            case '\r' -> 'r';
-            case '\f' -> 'f';
-            case '\0' -> '0';
-            default -> ch;
-        };
+        switch (ch) {
+            case '\n':
+                return 'n';
+            case '\t':
+                return 't';
+            case '\b':
+                return 'b';
+            case '\r':
+                return 'r';
+            case '\f':
+                return 'f';
+            case '\0':
+                return '0';
+            default:
+                return ch;
+        }
     }
 
     private char replaceWithControl(char ch) {
-        return switch (ch) {
-            case 'n' -> '\n';
-            case 't' -> '\t';
-            case 'b' -> '\b';
-            case 'r' -> '\r';
-            case 'f' -> '\f';
-            case '0' -> '\0';
-            default -> ch;
-        };
+        switch (ch) {
+            case 'n':
+                return '\n';
+            case 't':
+                return '\t';
+            case 'b':
+                return '\b';
+            case 'r':
+                return '\r';
+            case 'f':
+                return '\f';
+            case '0':
+                return '\0';
+            default:
+                return ch;
+        }
     }
 
 }
