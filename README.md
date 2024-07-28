@@ -1,6 +1,7 @@
 ## A blazing fast json parser
 
-The goal of the project is to have a fast json parser suitable for android mobiles running old versions of android.
+This library is an O(n) json parser that creates the least amount of objects.
+It works fast and does not trigger the garbage collector, making it suitable for old android devices.
 
 ---
 ### Benchmark
@@ -13,10 +14,12 @@ This library is **10 times** faster than org.json in parsing **[25 Megabytes](ht
 
 ---
 ### O(n) Time complexity
+
 The parser has an O(n) time complexity, meaning it iterates over the json string only once and does all the processing.\
 It also avoids creating unnecessary objects that trigger the garbage collector.
 ---
 ### Limitations
+
 1. If the json string is not valid, the library throws an exception but the exact problem may not be mentioned in the exception message.
 
 2. currently the api for manipulating json objects or arrays is quite basic. (get and put only) \
