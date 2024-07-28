@@ -6,7 +6,7 @@ class StringSubString implements CharSequence {
     final int start;
     final int end;
 
-    public StringSubString(String string, int start, int end) {
+    public StringSubString(final String string, final int start, final int end) {
         this.string = string;
         this.start = start;
         this.end = end;
@@ -18,13 +18,13 @@ class StringSubString implements CharSequence {
     }
 
     @Override
-    public char charAt(int index) {
+    public char charAt(final int index) {
         return string.charAt(start + index);
     }
 
 
     @Override
-    public CharSequence subSequence(int start, int end) {
+    public CharSequence subSequence(final int start, final int end) {
         return new StringSubString(string, start, end);
     }
 

@@ -5,7 +5,7 @@ class Escapable {
     final CharSequence escapedVersion;
     CharSequence unescapedVersion;
 
-    public Escapable(CharSequence escapedVersion) {
+    public Escapable(final CharSequence escapedVersion) {
         this.escapedVersion = escapedVersion;
     }
 
@@ -13,7 +13,7 @@ class Escapable {
         return escapedVersion.toString();
     }
 
-    public String getContentUnescaped(Escaper escaper) {
+    public String getContentUnescaped(final Escaper escaper) {
         if (unescapedVersion==null) {
             unescapedVersion = escaper.unescape(escapedVersion);
         }

@@ -42,7 +42,7 @@ public class ArrayTests implements TestClass {
         final String string = "[" + value + "]";
         final JSONArray jsonArray = new JSONArray(string);
         assertEquals(jsonArray.toString(), string);
-        final Integer got = jsonArray.getInteger(0);
+        final int got = jsonArray.getInteger(0);
         assertEquals(got, value);
 
     }

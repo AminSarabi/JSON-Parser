@@ -7,7 +7,7 @@ class ObjectEscaper extends Escaper {
     }
 
     @Override
-    protected boolean shouldEscape(char ch) {
+    protected boolean shouldEscape(final char ch) {
         return switch (ch) {
             case '{', '}', '\"', ',', '\\', ':', '\t', '\b', '\f', '\n', '\r' -> true;
             default -> false;
@@ -15,12 +15,12 @@ class ObjectEscaper extends Escaper {
     }
 
     @Override
-    void addCharToEscape(char... chars) {
+    void addCharToEscape(final char... chars) {
         throw new JSONException("special escaper can not be modified.");
     }
 
     @Override
-    void addCharToEscape(char ch) {
+    void addCharToEscape(final char ch) {
         throw new JSONException("special escaper can not be modified.");
     }
 }

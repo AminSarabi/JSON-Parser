@@ -6,7 +6,7 @@ class StringCharArray implements CharSequence {
     final int start;
     final int end;
 
-    public StringCharArray(char[] chars, int start, int end) {
+    public StringCharArray(final char[] chars, final int start, final int end) {
         this.chars = chars;
         this.start = start;
         this.end = end;
@@ -18,12 +18,12 @@ class StringCharArray implements CharSequence {
     }
 
     @Override
-    public char charAt(int index) {
+    public char charAt(final int index) {
         return chars[start+index];
     }
 
     @Override
-    public CharSequence subSequence(int start, int end) {
+    public CharSequence subSequence(final int start, final int end) {
         return new StringCharArray(chars, start, end);
     }
 

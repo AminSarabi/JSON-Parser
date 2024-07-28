@@ -17,7 +17,7 @@ public class Main {
         fileInputStream.close();
         BenchmarkTool.benchmark(() -> {
             JSONArray jsonArray = new JSONArray(text);
-        }, 500); //result: 7.6
+        }, 500); //result: 7.3
 
         BenchmarkTool.benchmark(() -> {
             JSONArray jsonArray = new JSONArray(text);

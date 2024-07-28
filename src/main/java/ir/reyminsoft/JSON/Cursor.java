@@ -3,9 +3,11 @@ package ir.reyminsoft.json;
 class Cursor {
     int index;
     final String string;
+    final int size;
 
-    Cursor(String s) {
+    Cursor(final String s) {
         this.string = s; //we reuse the string and avoid creating another char[] array. (memory gain)
+        size = s.length();
     }
 
     Cursor increment() {
@@ -13,23 +15,11 @@ class Cursor {
         return this;
     }
 
-    boolean incrementAndHasNext() {
-        if (index + 1 >= size()) return false;
-        index++;
-        return true;
-    }
-
-    Cursor increment(int count) {
+    void increment(final int count) {
         index += count;
-        return this;
     }
 
-    Cursor decrement() {
-        index--;
-        return this;
-    }
-
-    char charAt(int x) {
+    char charAt(final int x) {
         return string.charAt(x);
     }
 
@@ -41,12 +31,7 @@ class Cursor {
         return charAt(currentIndex());
     }
 
-    char nextCharacter(int forward) {
-        return charAt(currentIndex() + forward);
-    }
-
-
-    void setIndex(int value) {
+    void setIndex(final int value) {
         index = value;
     }
 
@@ -54,59 +39,27 @@ class Cursor {
         return index;
     }
 
-    void assertChar(char ch) {
+    void assertChar(final char ch) {
         if (!charIs(ch)) {
             throw new JSONException("Expected " + ch + " at " + index + " got " + currentCharacter());
         }
     }
 
-    boolean charIs(char character) {
+    boolean charIs(final char character) {
         return currentCharacter() == character;
     }
 
-    boolean indexIs(int other) {
-        return index == other;
-    }
 
-    boolean indexIsNot(int other) {
-        return index != other;
-    }
-
-    boolean indexIsLessThan(int other) {
+    boolean indexIsLessThan(final int other) {
         return index < other;
     }
 
     boolean hasNextChar() {
-        return indexIsLessThan(size());
+        return index < size;
     }
 
-    boolean hasNextChars(int count) {
-        return indexIsLessThan(currentIndex() + count);
-    }
 
-    void assertNextChars(int count) {
-        if (!hasNextChars(count)) {
-            throw new JSONException("unexpected end of stream at " + size());
-        }
-    }
-
-    boolean indexIsGreaterThan(int other) {
-        return index > other;
-    }
-
-    String getRangeAsString(int begin, int end) {
+    String getRangeAsString(final int begin, final int end) {
         return string.substring(begin, end);
-    }
-
-    String getRangeAsString(int count) {
-        return string.substring(currentIndex(), currentIndex() + 4);
-    }
-
-    void throwUnrecognizedCharacter() {
-        throw new JSONException("unrecognized character at " + currentIndex() + " " + currentCharacter());
-    }
-
-    void throwUnrecognizedValue(String value) {
-        throw new JSONException("unrecognized character near " + currentIndex() + " " + value);
     }
 }
