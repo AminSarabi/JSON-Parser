@@ -1,4 +1,4 @@
-package ir.reyminsoft.JSON;
+package ir.reyminsoft.json;
 
 class StringCharArray implements CharSequence {
 

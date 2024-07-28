@@ -1,4 +1,4 @@
-package ir.reyminsoft.JSON;
+package ir.reyminsoft.json;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static ir.reyminsoft.JSON.Utils.stringify;
+import static ir.reyminsoft.json.Utils.stringify;
 
 public class TestClassRunner {
     public static void assertEquals(final Object o, final Object o2) {

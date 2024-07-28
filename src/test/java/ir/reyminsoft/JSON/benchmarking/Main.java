@@ -1,6 +1,6 @@
-package ir.reyminsoft.JSON.benchmarking;
+package ir.reyminsoft.json.benchmarking;
 
-import ir.reyminsoft.JSON.JSONArray;
+import ir.reyminsoft.json.JSONArray;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) throws IOException {
 
-        FileInputStream fileInputStream = new FileInputStream("src/test/java/ir/reyminsoft/JSON/benchmarking/large-file.json");
+        FileInputStream fileInputStream = new FileInputStream("src/test/java/ir/reyminsoft/json/benchmarking/large-file.json");
         byte[] bytes = new byte[fileInputStream.available()];
         int read = fileInputStream.read(bytes);
         System.out.println("read " + read + " bytes from the file.");

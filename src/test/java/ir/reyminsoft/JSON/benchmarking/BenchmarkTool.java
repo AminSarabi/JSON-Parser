@@ -1,4 +1,4 @@
-package ir.reyminsoft.JSON.benchmarking;
+package ir.reyminsoft.json.benchmarking;
 
 
 import java.util.Arrays;

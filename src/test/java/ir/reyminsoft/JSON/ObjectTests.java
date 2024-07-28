@@ -1,10 +1,10 @@
-package ir.reyminsoft.JSON;
+package ir.reyminsoft.json;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Hashtable;
 import java.util.Random;
 
-import static ir.reyminsoft.JSON.TestClassRunner.assertEquals;
+import static ir.reyminsoft.json.TestClassRunner.assertEquals;
 
 public class ObjectTests implements TestClass {
 

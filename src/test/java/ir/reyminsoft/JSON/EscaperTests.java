@@ -1,8 +1,8 @@
-package ir.reyminsoft.JSON;
+package ir.reyminsoft.json;
 
 import java.util.Hashtable;
 
-import static ir.reyminsoft.JSON.ObjectTests.randomString;
+import static ir.reyminsoft.json.ObjectTests.randomString;
 
 public class EscaperTests implements TestClass {
 
