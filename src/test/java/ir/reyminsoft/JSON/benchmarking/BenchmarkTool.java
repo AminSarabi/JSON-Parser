@@ -10,8 +10,8 @@ public class BenchmarkTool {
     public static void benchmark(Runnable runnable, int runCount) {
         System.out.println("warming up...");
         Object[][] objects = new Object[100][];
-        for (int x = 0; x != 500; x++) {
-            objects[x % 100] = perform_standard(1000); //warm up
+        for (int x = 0; x != 5000; x++) {
+            objects[x % 100] = perform_standard(10000); //warm up
         }
         long runnableSum = 0;
         long controlSum = 0;

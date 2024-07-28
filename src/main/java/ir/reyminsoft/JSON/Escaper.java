@@ -10,27 +10,24 @@ class Escaper {
     StringBuilder stringBuilder;
 
     Escaper(char escapingChar) {
-        this.charsToEscape = new HashSet<>();
         this.escapingChar = escapingChar;
-        this.charsToEscape.add(escapingChar);
         //initiate with a big capacity.
-        this.stringBuilder = new StringBuilder(8192);
+        this.stringBuilder = new StringBuilder(2048);
         // this does not have that much of memory overhead but shows benefit on big objects.
     }
 
 
     Escaper(char escapingChar, int initialCapacity) {
-        this.charsToEscape = new HashSet<>();
         this.escapingChar = escapingChar;
-        this.charsToEscape.add(escapingChar);
         this.stringBuilder = new StringBuilder(initialCapacity);
     }
 
     protected boolean shouldEscape(char ch) {
-        return charsToEscape.contains(ch);
+        return ch == escapingChar || (charsToEscape != null && charsToEscape.contains(ch));
     }
 
     void addCharToEscape(char ch) {
+        if (this.charsToEscape == null) charsToEscape = new HashSet<>();
         this.charsToEscape.add(ch);
     }
 

@@ -1,6 +1,6 @@
 package ir.reyminsoft.JSON;
 
-public class ObjectEscaper extends Escaper {
+class ObjectEscaper extends Escaper {
 
     public ObjectEscaper() {
         super('\\');
@@ -12,5 +12,15 @@ public class ObjectEscaper extends Escaper {
             case '{', '}', '\"', ',', '\\', ':', '\t', '\b', '\f', '\n', '\r' -> true;
             default -> false;
         };
+    }
+
+    @Override
+    void addCharToEscape(char... chars) {
+        throw new JSONException("special escaper can not be modified.");
+    }
+
+    @Override
+    void addCharToEscape(char ch) {
+        throw new JSONException("special escaper can not be modified.");
     }
 }

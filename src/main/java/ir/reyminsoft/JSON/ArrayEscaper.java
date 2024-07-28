@@ -13,4 +13,14 @@ public class ArrayEscaper extends Escaper {
             default -> false;
         };
     }
+
+    @Override
+    void addCharToEscape(char... chars) {
+        throw new JSONException("special escaper can not be modified.");
+    }
+
+    @Override
+    void addCharToEscape(char ch) {
+        throw new JSONException("special escaper can not be modified.");
+    }
 }
