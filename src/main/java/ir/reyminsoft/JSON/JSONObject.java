@@ -42,6 +42,8 @@ class JSONObject {
                         currentKey = null;
                     }
                     break;
+                case '+':
+                case '-':
                 case '0':
                 case '1':
                 case '2':
