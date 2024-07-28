@@ -24,9 +24,9 @@ It also avoids creating unnecessary objects that trigger the garbage collector.
 
 ### Limitations
 
-1. If the json string is not valid, the library throws an exception but the exact problem may not be mentioned in the exception message.
-
-2. currently the api for manipulating json objects or arrays is quite basic. (get and put only) \
+1. The library assumes that the json input has valid syntax. this assumption allows for optimizations like seeing the character `f` and interpreting it as `false`, without looping through the remaining characters. \
+in case of an invalid json input, the thrown exception may not have a descriptive and in detail explanation. 
+2. currently the api for manipulating json objects or arrays is quite basic. (get and put only)
 3. The parser passes all the unit tests, including the processing of 25 Mbs of json text. But the code has not been used in the wild.
 
 ---
