@@ -1,13 +1,14 @@
 package ir.reyminsoft.json;
 
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class JSONObject {
 
     static final ObjectEscaper escaper = new ObjectEscaper();
 
     static final Object NULL = new Object();
-    private final Hashtable<String, Object> hashtable;
+    private final Map<String, Object> hashtable;
 
 
     final int cachedStringLength = 128;
@@ -17,19 +18,20 @@ public class JSONObject {
     }
 
     public JSONObject() {
-        this.hashtable = new Hashtable<>();
+        this.hashtable = new LinkedHashMap<>();
     }
 
-    JSONObject(final Hashtable<String, Object> hashtable) {
+    JSONObject(final Map<String, Object> hashtable) {
         this.hashtable = hashtable;
     }
 
-    static Hashtable<String, Object> readObject(final Cursor cursor, int openBracesCount) {
+    static Map<String, Object> readObject(final Cursor cursor, int openBracesCount) {
         final int beginCursor = cursor.currentIndex();
-        final Hashtable<String, Object> table = new Hashtable<>();
+        final Map<String, Object> table = new LinkedHashMap<>();
         boolean readingValue = false;
         String currentKey = null;
         while (cursor.hasNextChar()) {
+            final char endChar = '}';
             char ch = cursor.currentCharacter();
             final int characterIndex = cursor.currentIndex();
             cursor.increment();
@@ -56,36 +58,11 @@ public class JSONObject {
                 case '8':
                 case '9':
                     if (readingValue) {
-                        boolean end = false;
-                        final int beginIndex = cursor.currentIndex(); //we can safely assume that this index is a number.
-                        int endIndex = -1;
-                        boolean dotSeen = false;
-                        while (cursor.hasNextChar()) {
-                            ch = cursor.currentCharacter();
-                            if (Character.isWhitespace(ch)) {
-                                endIndex = cursor.currentIndex();
-                                break;
-                            } else if (ch == ',') {
-                                endIndex = cursor.currentIndex();
-                                break;
-                            } else if (ch == '}') {
-                                end = true;
-                                endIndex = cursor.currentIndex();
-                                break;
-                            } else if (ch == '.') {
-                                if (dotSeen) throw new JSONException("numeric value has more than one points");
-                                dotSeen = true;
-                            }
-                            cursor.increment();
+                        table.put(currentKey, readNumeric(cursor, ch, endChar));
+                        if (cursor.isMarked()) {
+                            cursor.clearMark();
+                            return table;
                         }
-                        String str = cursor.getRangeAsString(beginIndex - 1, endIndex);
-                        //ATTENTION: do not replace the following with ternary conditional. that converts both to double.
-                        if (dotSeen) {
-                            table.put(currentKey, Double.parseDouble(str));
-                        } else {
-                            table.put(currentKey, Integer.parseInt(str));
-                        }
-                        if (end) return table;
                         readingValue = false;
                         currentKey = null;
                     } else {
@@ -169,7 +146,88 @@ public class JSONObject {
         return table;
     }
 
-    static Hashtable<String, Object> readObject(final Cursor cursor) {
+    static Number readNumeric(Cursor cursor, char ch, char endChar) {
+        Number n;
+        boolean isNegative = ch == '-';
+        boolean exponentIsNegative = false;
+        long literal = isNegative ? 0 : ch - '0';
+        long fractional = 0;
+        long fractionalExponent = 0;
+        double exponent = 0;
+        int mode = 0;
+        loop:
+        while (cursor.hasNextChar()) {
+            ch = cursor.currentCharacter();
+            if (ch == endChar) {
+                cursor.increment();
+                cursor.mark();
+                break;
+            }
+            switch (ch) {
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    if (mode == 0) literal = literal * 10L + (ch - '0');
+                    if (mode == 1) {
+                        fractionalExponent++;
+                        fractional = fractional * 10L + (ch - '0');
+                    }
+                    if (mode == 2) throw new JSONException("invalid numeric value.");
+                    if (mode == 3) exponent = exponent * 10L + (ch - '0');
+                    break;
+                case '-':
+                    exponentIsNegative = false;
+                    if (mode != 2) throw new JSONException("invalid numeric value.");
+                    mode = 4;
+                    break;
+                case '+':
+                    exponentIsNegative = true;
+                    if (mode != 2) throw new JSONException("invalid numeric value.");
+                    mode = 4;
+                    break;
+                case '.':
+                    if (mode == 1) throw new JSONException("numeric value with more than 1 point.");
+                    mode++;
+                    break;
+                case 'E':
+                case 'e':
+                    if (mode == 2) throw new JSONException("invalid numeric value.");
+                    mode = 2;
+                    break;
+                case ',':
+                    cursor.increment();
+                    break loop;
+                default:
+                    break loop;
+            }
+            cursor.increment();
+        }
+        double pow = Math.pow(10, exponent * (exponentIsNegative ? -1 : 1));
+        int factor = isNegative ? -1 : 1;
+        if (fractionalExponent != 0) { //has fractional, needs to be parsed as double.
+            if (fractional == 0) {
+                double number = literal * pow;
+                n = number * (double) factor;
+            } else {
+                double number = (literal + fractional * Math.pow(10, -fractionalExponent)) * pow;
+                n = number * (double) factor;
+            }
+        } else {
+            long number = literal * (long) pow;
+            if (number > Integer.MAX_VALUE) n = number * factor;
+            else n = (int) number * factor;
+        }
+        return n;
+    }
+
+    static Map<String, Object> readObject(final Cursor cursor) {
         return readObject(cursor, 0);
     }
 
@@ -269,6 +327,11 @@ public class JSONObject {
     public int getInt(final String key) {
         if (!hashtable.containsKey(key)) return 0;
         return (int) hashtable.get(key);
+    }
+
+    public long getLong(final String key) {
+        if (!hashtable.containsKey(key)) return 0;
+        return (long) hashtable.get(key);
     }
 
     public double getDouble(final String key) {

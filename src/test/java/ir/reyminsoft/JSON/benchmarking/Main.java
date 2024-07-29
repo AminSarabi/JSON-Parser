@@ -8,7 +8,7 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) throws IOException {
 
-        FileInputStream fileInputStream = new FileInputStream("src/test/java/ir/reyminsoft/json/benchmarking/large-file.json");
+        FileInputStream fileInputStream = new FileInputStream("src/test/java/ir/reyminsoft/json/large-file.json");
         byte[] bytes = new byte[fileInputStream.available()];
         int read = fileInputStream.read(bytes);
         System.out.println("read " + read + " bytes from the file.");
@@ -22,7 +22,7 @@ public class Main {
         BenchmarkTool.benchmark(() -> {
             JSONArray jsonArray = new JSONArray(text);
             jsonArray.toString();
-        }, 500); //result: 23
+        }, 500); //result: 20
 
     }
 }

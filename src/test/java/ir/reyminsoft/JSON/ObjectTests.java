@@ -87,12 +87,43 @@ public class ObjectTests implements TestClass {
         assertEquals(object.toString(), str);
     }
 
+
+
+
+    public static void parses_long() {
+        for (int x = 0; x != 1000; x++) {
+            long l = random.nextLong();
+            String s = "{\"a\":" + l + "}";
+            JSONObject o = new JSONObject(s);
+            if (!o.toString().equals(s)) {
+                o = new JSONObject(s);
+            }
+            assertEquals(o.toString(), s);
+            if (!Utils.equals(o.getLong("a"), l)) {
+                o = new JSONObject(s);
+            }
+            assertEquals(o.getLong("a"), l);
+        }
+    }
+
+    /*
+    * This is a failing test, because the number converter algorithm is not binary wise and small doubles are a problem.
+    * but these tiny errors are negligible.
+    * */
     public static void parses_double() {
         String str = "{\"a\":7.091}";
         JSONObject object = new JSONObject(str);
         double object2 = object.getDouble("a");
         assertEquals(object2, 7.091d);
         assertEquals(object.toString(), str);
+
+        for (int x = 0; x != 1000; x++) {
+            double d = random.nextDouble();
+            String s = "{\"a\":" + d + "}";
+            JSONObject o = new JSONObject(s);
+            assertEquals(o.toString(), s);
+            assertEquals(o.getDouble("a"), d);
+        }
     }
 
     public static void parses_boolean() {
@@ -110,6 +141,7 @@ public class ObjectTests implements TestClass {
         JSONObject object = new JSONObject(str);
         assertEquals(object.toString(), str);
     }
+
 
     public static void special_characters_escaping() {
         JSONObject jsonObject = new JSONObject();

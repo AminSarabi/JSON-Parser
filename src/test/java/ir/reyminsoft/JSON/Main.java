@@ -5,5 +5,6 @@ public class Main {
         TestClassRunner.run(ObjectTests.class);
         TestClassRunner.run(ArrayTests.class);
         TestClassRunner.run(EscaperTests.class);
+        TestClassRunner.run(FileTest.class);
     }
 }

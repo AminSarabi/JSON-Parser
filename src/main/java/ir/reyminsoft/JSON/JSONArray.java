@@ -80,36 +80,11 @@ public class JSONArray {
                 case '7':
                 case '8':
                 case '9':
-                    boolean end = false;
-                    final int beginIndex = cursor.currentIndex(); //we can safely assume that this index is a number.
-                    int endIndex = -1;
-                    boolean dotSeen = false;
-                    while (cursor.hasNextChar()) {
-                        ch = cursor.currentCharacter();
-                        if (Character.isWhitespace(ch)) {
-                            endIndex = cursor.currentIndex();
-                            break;
-                        } else if (ch == ',') {
-                            endIndex = cursor.currentIndex();
-                            break;
-                        } else if (ch == ']') {
-                            end = true;
-                            endIndex = cursor.currentIndex();
-                            break;
-                        } else if (ch == '.') {
-                            if (dotSeen) throw new JSONException("numeric value has more than one points");
-                            dotSeen = true;
-                        }
-                        cursor.increment();
+                    list.add(JSONObject.readNumeric(cursor, ch, ']'));
+                    if (cursor.isMarked()) {
+                        cursor.clearMark();
+                        return list;
                     }
-                    String str = cursor.getRangeAsString(beginIndex - 1, endIndex);
-                    //ATTENTION: do not replace the following with ternary conditional. that converts both to double.
-                    if (dotSeen) {
-                        list.add(Double.parseDouble(str));
-                    } else {
-                        list.add(Integer.parseInt(str));
-                    }
-                    if (end) return list;
                     break;
             }
         }

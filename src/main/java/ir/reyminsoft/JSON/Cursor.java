@@ -15,6 +15,20 @@ class Cursor {
         return this;
     }
 
+    boolean marked;
+
+    void mark() {
+        marked = true;
+    }
+
+    public boolean isMarked() {
+        return marked;
+    }
+
+    void clearMark(){
+        marked = false;
+    }
+
     void increment(final int count) {
         index += count;
     }
