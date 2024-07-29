@@ -28,6 +28,7 @@ It also avoids creating unnecessary objects that trigger the garbage collector.
 in case of an invalid json input, the thrown exception may not have a descriptive and in detail explanation. 
 2. currently the api for manipulating json objects or arrays is quite basic. (get and put only)
 3. The parser passes all the unit tests, including the processing of 25 Mbs of json text. But the code has not been used in the wild.
+4. The parser converts tiny double values with a **tiny error**. it uses specialized algorithm to convert numbers without creating new objects or implicitly iterating over the characters, and this comes at the cost of a very small error on very small numbers.
 
 ---
 
