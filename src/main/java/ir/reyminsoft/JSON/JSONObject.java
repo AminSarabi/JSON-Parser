@@ -3,6 +3,7 @@ package ir.reyminsoft.json;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@SuppressWarnings({"UnusedReturnValue", "unused"})
 public class JSONObject {
 
     static final ObjectEscaper escaper = new ObjectEscaper();
@@ -212,13 +213,13 @@ public class JSONObject {
         double pow = Math.pow(10, exponent * (exponentIsNegative ? -1 : 1));
         int factor = isNegative ? -1 : 1;
         if (fractionalExponent != 0) { //has fractional, needs to be parsed as double.
+            double number;
             if (fractional == 0) {
-                double number = literal * pow;
-                n = number * (double) factor;
+                number = literal * pow;
             } else {
-                double number = (literal + fractional * Math.pow(10, -fractionalExponent)) * pow;
-                n = number * (double) factor;
+                number = (literal + fractional * Math.pow(10, -fractionalExponent)) * pow;
             }
+            n = number * (double) factor;
         } else {
             long number = literal * (long) pow;
             if (number > Integer.MAX_VALUE) n = number * factor;
@@ -265,7 +266,7 @@ public class JSONObject {
     }
 
 
-    void put(final String key, final Object o) {
+    public JSONObject put(final String key, final Object o) {
         if (o == null) throw new JSONException("putting null in json-object. if intended, use JSONObject.NULL instead");
         if (!(o instanceof String || o instanceof Integer || o instanceof Double ||
                 o instanceof Boolean || o instanceof JSONArray
@@ -273,6 +274,7 @@ public class JSONObject {
             throw new JSONException("unknown type to put in json-object: " + o.getClass());
         }
         this.hashtable.put(key, o);
+        return this;
     }
 
     @Override
