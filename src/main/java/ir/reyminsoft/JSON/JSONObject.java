@@ -267,14 +267,21 @@ public class JSONObject {
 
 
     public JSONObject put(final String key, final Object o) {
-        if (o == null) throw new JSONException("putting null in json-object. if intended, use JSONObject.NULL instead");
-        if (!(o instanceof String || o instanceof Integer || o instanceof Double ||
-                o instanceof Boolean || o instanceof JSONArray
-                || o instanceof JSONObject || o == JSONObject.NULL)) {
-            throw new JSONException("unknown type to put in json-object: " + o.getClass());
-        }
+        String possibleError = validateType(o);
+        if (possibleError != null) throw new JSONException(possibleError);
         this.hashtable.put(key, o);
         return this;
+    }
+
+    public static String validateType(Object o) {
+        String error = null;
+        if (o == null) error = "putting null in json-object. if intended, use JSONObject.NULL instead";
+        else if (!(o instanceof String || o instanceof Integer || o instanceof Double ||
+                o instanceof Boolean || o instanceof JSONArray
+                || o instanceof JSONObject || o == JSONObject.NULL)) {
+            error = "unknown type to put in json-object: " + o.getClass();
+        }
+        return error;
     }
 
     @Override

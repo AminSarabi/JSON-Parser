@@ -177,4 +177,13 @@ public class JSONArray {
         @SuppressWarnings("unchecked") final T casted = (T) o;
         return casted;
     }
+
+
+    public int size() {
+        return objectList.size();
+    }
+
+    public int length() {
+        return size();
+    }
 }
