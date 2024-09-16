@@ -128,9 +128,10 @@ public class JSONArray {
         stringBuilder.append("]");
     }
 
-    public void put(final Object o) {
-        if (o == null) throw new JSONException("putting null in json-array. if intended, use JSONObject.NULL instead");
-        if (!(o instanceof String || o instanceof Integer || o instanceof Double ||
+    public void put(Object o) {
+        if (o == null) {
+            o = NULL;
+        }else if (!(o instanceof String || o instanceof Integer || o instanceof Double ||
                 o instanceof Boolean || o instanceof JSONArray
                 || o instanceof JSONObject || o == NULL)) {
             throw new JSONException("unknown type to put in json-array: " + o.getClass());

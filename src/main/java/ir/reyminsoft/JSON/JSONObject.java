@@ -275,8 +275,9 @@ public class JSONObject {
 
     public static String validateType(Object o) {
         String error = null;
-        if (o == null) error = "putting null in json-object. if intended, use JSONObject.NULL instead";
-        else if (!(o instanceof String || o instanceof Integer || o instanceof Double ||
+        if (o == null) {
+            return null;
+        } else if (!(o instanceof String || o instanceof Integer || o instanceof Double ||
                 o instanceof Boolean || o instanceof JSONArray
                 || o instanceof JSONObject || o == JSONObject.NULL)) {
             error = "unknown type to put in json-object: " + o.getClass();
