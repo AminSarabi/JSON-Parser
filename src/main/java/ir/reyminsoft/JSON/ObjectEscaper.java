@@ -9,7 +9,7 @@ class ObjectEscaper extends Escaper {
     @Override
     protected boolean shouldEscape(final char ch) {
         return switch (ch) {
-            case '{', '}', '\"', ',', '\\', '\t', '\b', '\f', '\n', '\r' -> true;
+            case '\"', '\\' , '/' , '\t', '\b', '\f', '\n', '\r' -> true;
             default -> false;
         };
     }

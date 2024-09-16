@@ -9,10 +9,8 @@ class ArrayEscaper extends Escaper {
     @Override
     protected boolean shouldEscape(final char ch) {
         switch (ch) {
-            case '[':
-            case ']':
             case '\"':
-            case ',':
+            case '/':
             case '\t':
             case '\b':
             case '\\':

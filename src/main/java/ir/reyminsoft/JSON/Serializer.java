@@ -27,7 +27,7 @@ public class Serializer {
                 Object value = jsonObject.get(field.getName());
                 //JSONObject.NULL conversion is not needed as jsonObject.get already handles it.
                 if (field.getType().isPrimitive()) {
-                    field.set(t, value);
+                    if (value!=null) field.set(t, value);
                 } else {
                     if (value instanceof JSONObject && field.getType() != JSONObject.class) {
                         if (recursionAvoidSet.containsKey(value)) {
@@ -68,7 +68,7 @@ public class Serializer {
             recursionAvoidSet.put(o, jsonObject);
             for (Field field : o.getClass().getDeclaredFields()) {
                 if (Modifier.isStatic(field.getModifiers())) continue;
-                if(!field.canAccess(o))field.setAccessible(true);
+                if (!Modifier.isPublic(field.getModifiers())) throw new RuntimeException("serialized object has non public values.");
                 Object value = field.get(o);
                 if (value == null) value = JSONObject.NULL;
                 if (JSONObject.validateType(value) != null) {

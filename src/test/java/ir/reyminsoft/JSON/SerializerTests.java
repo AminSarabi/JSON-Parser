@@ -68,8 +68,9 @@ public class SerializerTests implements TestClass {
         ObjectTypeThree one_1 = new ObjectTypeThree();
         JSONObject jsonObject = Serializer.serialize(one_1);
         ObjectTypeThree one_2 = Serializer.deserialize(jsonObject, ObjectTypeThree.class);
-
     }
+
+
 
 
 }
