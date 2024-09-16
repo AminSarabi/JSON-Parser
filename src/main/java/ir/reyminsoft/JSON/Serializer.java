@@ -26,11 +26,16 @@ public class Serializer {
                 if (Modifier.isStatic(field.getModifiers())) continue;
                 Object value = jsonObject.get(field.getName());
                 //JSONObject.NULL conversion is not needed as jsonObject.get already handles it.
-                if (value instanceof JSONObject && field.getType() != JSONObject.class) {
-                    if (recursionAvoidSet.containsKey(value)) {
-                        value = recursionAvoidSet.get(value);
-                    } else value = deserialize((JSONObject) value, field.getType(), recursionAvoidSet);
+                if (field.getType().isPrimitive()) {
+                    field.set(t, value);
+                } else {
+                    if (value instanceof JSONObject && field.getType() != JSONObject.class) {
+                        if (recursionAvoidSet.containsKey(value)) {
+                            value = recursionAvoidSet.get(value);
+                        } else value = deserialize((JSONObject) value, field.getType(), recursionAvoidSet);
+                    }
                 }
+
                 field.set(t, value);
             }
             return t;
@@ -66,18 +71,23 @@ public class Serializer {
                 Object value = field.get(o);
                 if (value == null) value = JSONObject.NULL;
                 if (JSONObject.validateType(value) != null) {
-                    if (recursionAvoidSet.containsKey(value)) {
-                        jsonObject.put(field.getName(), recursionAvoidSet.get(value));
+                    if (field.getType().isPrimitive()) {
+                        jsonObject.put(field.getName(), value);
                     } else {
-                        JSONObject convertedInternalObject = serialize(value, recursionAvoidSet);
-                        jsonObject.put(field.getName(), convertedInternalObject);
+                        if (recursionAvoidSet.containsKey(value)) {
+                            jsonObject.put(field.getName(), recursionAvoidSet.get(value));
+                        } else {
+                            JSONObject convertedInternalObject = serialize(value, recursionAvoidSet);
+                            jsonObject.put(field.getName(), convertedInternalObject);
+                        }
                     }
 
                 } else jsonObject.put(field.getName(), value);
             }
             return jsonObject;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            throw new RuntimeException("error");
         }
     }
 }

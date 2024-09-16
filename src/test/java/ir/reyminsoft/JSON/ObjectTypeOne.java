@@ -6,6 +6,8 @@ public class ObjectTypeOne {
 
     ObjectTypeTwo objectTypeTwo;
 
+    long primitiveValue= 7091;
+
 
     @Override
     public boolean equals(Object o) {

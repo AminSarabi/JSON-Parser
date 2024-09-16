@@ -277,7 +277,7 @@ public class JSONObject {
         String error = null;
         if (o == null) {
             return null;
-        } else if (!(o instanceof String || o instanceof Integer || o instanceof Double ||
+        } else if (!(o instanceof String || o instanceof Integer || o instanceof Long || o instanceof Double ||
                 o instanceof Boolean || o instanceof JSONArray
                 || o instanceof JSONObject || o == JSONObject.NULL)) {
             error = "unknown type to put in json-object: " + o.getClass();

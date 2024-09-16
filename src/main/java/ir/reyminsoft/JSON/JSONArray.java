@@ -131,7 +131,7 @@ public class JSONArray {
     public void put(Object o) {
         if (o == null) {
             o = NULL;
-        }else if (!(o instanceof String || o instanceof Integer || o instanceof Double ||
+        } else if (!(o instanceof String || o instanceof Integer || o instanceof Long || o instanceof Double ||
                 o instanceof Boolean || o instanceof JSONArray
                 || o instanceof JSONObject || o == NULL)) {
             throw new JSONException("unknown type to put in json-array: " + o.getClass());
