@@ -68,6 +68,7 @@ public class Serializer {
             recursionAvoidSet.put(o, jsonObject);
             for (Field field : o.getClass().getDeclaredFields()) {
                 if (Modifier.isStatic(field.getModifiers())) continue;
+                if(!field.canAccess(o))field.setAccessible(true);
                 Object value = field.get(o);
                 if (value == null) value = JSONObject.NULL;
                 if (JSONObject.validateType(value) != null) {

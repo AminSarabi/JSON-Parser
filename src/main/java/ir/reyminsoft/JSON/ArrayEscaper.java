@@ -13,7 +13,6 @@ class ArrayEscaper extends Escaper {
             case ']':
             case '\"':
             case ',':
-            case ':':
             case '\t':
             case '\b':
             case '\\':
