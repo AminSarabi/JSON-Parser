@@ -1,6 +1,7 @@
 package ir.reyminsoft.json;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -22,12 +23,13 @@ public class Serializer {
             recursionAvoidSet.put(jsonObject, t);
             Field[] fields = clazz.getDeclaredFields();
             for (Field field : fields) {
+                if (Modifier.isStatic(field.getModifiers())) continue;
                 Object value = jsonObject.get(field.getName());
                 //JSONObject.NULL conversion is not needed as jsonObject.get already handles it.
                 if (value instanceof JSONObject && field.getType() != JSONObject.class) {
                     if (recursionAvoidSet.containsKey(value)) {
                         value = recursionAvoidSet.get(value);
-                    } else value = deserialize((JSONObject) value, field.getType(),recursionAvoidSet);
+                    } else value = deserialize((JSONObject) value, field.getType(), recursionAvoidSet);
                 }
                 field.set(t, value);
             }
@@ -60,6 +62,7 @@ public class Serializer {
             JSONObject jsonObject = new JSONObject();
             recursionAvoidSet.put(o, jsonObject);
             for (Field field : o.getClass().getDeclaredFields()) {
+                if (Modifier.isStatic(field.getModifiers())) continue;
                 Object value = field.get(o);
                 if (value == null) value = JSONObject.NULL;
                 if (JSONObject.validateType(value) != null) {

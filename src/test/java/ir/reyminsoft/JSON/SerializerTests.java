@@ -48,7 +48,7 @@ public class SerializerTests implements TestClass {
         assertEquals(one_1, one_2);
     }
 
-    @ThisTestOnly
+
     public static void test_internal_object_recursion() {
         ObjectTypeOne one_1 = new ObjectTypeOne();
         ObjectTypeTwo two_1 = new ObjectTypeTwo();
@@ -61,6 +61,14 @@ public class SerializerTests implements TestClass {
         assertEquals(one_2.objectTypeTwo.value, "testing here.");
         assertEquals(one_2.objectTypeTwo.objectTypeOne, one_1);
         assertEquals(one_1, one_2);
+    }
+
+
+    public static void test_skip_static_fields(){
+        ObjectTypeThree one_1 = new ObjectTypeThree();
+        JSONObject jsonObject = Serializer.serialize(one_1);
+        ObjectTypeThree one_2 = Serializer.deserialize(jsonObject, ObjectTypeThree.class);
+
     }
 
 
