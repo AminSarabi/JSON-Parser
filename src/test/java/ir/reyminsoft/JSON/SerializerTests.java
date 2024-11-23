@@ -1,5 +1,7 @@
 package ir.reyminsoft.json;
 
+import java.util.ArrayList;
+
 import static ir.reyminsoft.json.TestClassRunner.assertEquals;
 
 public class SerializerTests implements TestClass {
@@ -64,13 +66,23 @@ public class SerializerTests implements TestClass {
     }
 
 
-    public static void test_skip_static_fields(){
+    public static void test_skip_static_fields() {
         ObjectTypeThree one_1 = new ObjectTypeThree();
         JSONObject jsonObject = Serializer.serialize(one_1);
         ObjectTypeThree one_2 = Serializer.deserialize(jsonObject, ObjectTypeThree.class);
     }
 
 
+    @ThisTestOnly
+    public static void test_internal_array() {
+        ObjectTypeFour typeFour = new ObjectTypeFour();
+        typeFour.strings = new ArrayList<>();
+        typeFour.strings.add("hi");
+        JSONObject jsonObject = Serializer.serialize(typeFour);
+        System.out.println(jsonObject.toString());
+        ObjectTypeFour typeFour1 = Serializer.deserialize(jsonObject, ObjectTypeFour.class);
+        System.out.println(Serializer.serialize(typeFour1).toString());
+    }
 
 
 }

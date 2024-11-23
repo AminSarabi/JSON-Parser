@@ -4,9 +4,9 @@ import java.util.Objects;
 
 public class ObjectTypeOne {
 
-    ObjectTypeTwo objectTypeTwo;
+    public ObjectTypeTwo objectTypeTwo;
 
-    long primitiveValue= 7091;
+    public long primitiveValue = 7091;
 
 
     @Override
