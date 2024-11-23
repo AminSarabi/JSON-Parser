@@ -63,7 +63,58 @@ class Escaper {
         for (; i != size; i++) {
             ch = cursor.charAt(i);
             if (wasEscaped) {
-                buffer[bufferIndex++] = replaceWithControl(ch);
+                if (ch == 'u') {
+                    //this can be a unicode character. needs to be converted to the actual one.
+                    int hex = 0;
+                    boolean hexSuccess = true;
+                    for (int ii = 0; ii != 4; ii++) {
+                        i++;
+                        ch = cursor.charAt(i);
+                        switch (ch) {
+                            case '0':
+                                hex *= 16;
+                                break;
+                            case '1':
+                            case '2':
+                            case '3':
+                            case '4':
+                            case '5':
+                            case '6':
+                            case '7':
+                            case '8':
+                            case '9':
+                                hex += (int) (Math.pow(16, 3 - ii) * (ch - '0'));
+                                break;
+                            case 'A':
+                            case 'a':
+                            case 'B':
+                            case 'b':
+                            case 'C':
+                            case 'c':
+                            case 'D':
+                            case 'd':
+                            case 'E':
+                            case 'e':
+                            case 'F':
+                            case 'f':
+                                hex += (int) (Math.pow(16, 3 - ii) * ((Character.toUpperCase(ch)) - 'A' + 10));
+                                break;
+                            default:
+                                hexSuccess = false;
+                                break;
+                        }
+                    }
+                    if (hexSuccess) {
+                        ch = (char) hex;
+                        buffer[bufferIndex] = ch;
+                    } else {
+                        i -= 4;
+                        buffer[bufferIndex++] = '\\';
+                        buffer[bufferIndex++] = 'u';
+                    }
+                } else {
+                    buffer[bufferIndex++] = replaceWithControl(ch);
+                }
                 wasEscaped = false;
             } else if (ch == prey) {
                 i++;
@@ -87,7 +138,58 @@ class Escaper {
         int bufferIndex = 0;
         for (int x = start; x != end; x++) {
             if (wasEscaped) {
-                buffer[bufferIndex] = replaceWithControl(chars[x]);
+                if (chars[x] == 'u') {
+                    //this can be a unicode character. needs to be converted to the actual one.
+                    int hex = 0;
+                    boolean hexSuccess = true;
+                    for (int ii = 0; ii != 4; ii++) {
+                        x++;
+                        char ch = chars[x];
+                        switch (ch) {
+                            case '0':
+                                hex *= 16;
+                                break;
+                            case '1':
+                            case '2':
+                            case '3':
+                            case '4':
+                            case '5':
+                            case '6':
+                            case '7':
+                            case '8':
+                            case '9':
+                                hex += (int) (Math.pow(16, 3 - ii) * (ch - '0'));
+                                break;
+                            case 'A':
+                            case 'a':
+                            case 'B':
+                            case 'b':
+                            case 'C':
+                            case 'c':
+                            case 'D':
+                            case 'd':
+                            case 'E':
+                            case 'e':
+                            case 'F':
+                            case 'f':
+                                hex += (int) (Math.pow(16, 3 - ii) * ((Character.toUpperCase(ch)) - 'A' + 10));
+                                break;
+                            default:
+                                hexSuccess = false;
+                                break;
+                        }
+                    }
+                    if (hexSuccess) {
+                        char ch = (char) hex;
+                        buffer[bufferIndex] = ch;
+                    } else {
+                        x -= 4;
+                        buffer[bufferIndex++] = '\\';
+                        buffer[bufferIndex] = 'u';
+                    }
+                } else {
+                    buffer[bufferIndex] = replaceWithControl(chars[x]);
+                }
                 bufferIndex++;
                 if (bufferIndex >= buffer.length) break;
                 wasEscaped = false;
@@ -140,14 +242,65 @@ class Escaper {
         return new StringCharArray(second, 0, second.length);
     }
 
-    CharSequence unescape(final CharSequence charSequence){
+    CharSequence unescape(final CharSequence charSequence) {
         final int size = charSequence.length();
         final char[] buffer = new char[size];
         boolean wasEscaped = false;
         int bufferIndex = 0;
         for (int x = 0; x != size; x++) {
             if (wasEscaped) {
-                buffer[bufferIndex] = replaceWithControl(charSequence.charAt(x));
+                if (charSequence.charAt(x) == 'u') {
+                    //this can be a unicode character. needs to be converted to the actual one.
+                    int hex = 0;
+                    boolean hexSuccess = true;
+                    for (int ii = 0; ii != 4; ii++) {
+                        x++;
+                        char ch = charSequence.charAt(x);
+                        switch (ch) {
+                            case '0':
+                                hex *= 16;
+                                break;
+                            case '1':
+                            case '2':
+                            case '3':
+                            case '4':
+                            case '5':
+                            case '6':
+                            case '7':
+                            case '8':
+                            case '9':
+                                hex += (int) (Math.pow(16, 3 - ii) * (ch - '0'));
+                                break;
+                            case 'A':
+                            case 'a':
+                            case 'B':
+                            case 'b':
+                            case 'C':
+                            case 'c':
+                            case 'D':
+                            case 'd':
+                            case 'E':
+                            case 'e':
+                            case 'F':
+                            case 'f':
+                                hex += (int) (Math.pow(16, 3 - ii) * ((Character.toUpperCase(ch)) - 'A' + 10));
+                                break;
+                            default:
+                                hexSuccess = false;
+                                break;
+                        }
+                    }
+                    if (hexSuccess) {
+                        char ch = (char) hex;
+                        buffer[bufferIndex] = ch;
+                    } else {
+                        x -= 4;
+                        buffer[bufferIndex++] = '\\';
+                        buffer[bufferIndex++] = 'u';
+                    }
+                } else {
+                    buffer[bufferIndex] = replaceWithControl(charSequence.charAt(x));
+                }
                 bufferIndex++;
                 if (bufferIndex >= buffer.length) break;
                 wasEscaped = false;

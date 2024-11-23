@@ -79,4 +79,24 @@ public class EscaperTests implements TestClass {
         }
     }
 
+    public static void unicode_values() {
+        String sJava = "\\u0048\\u0065\\u006C\\u006C\\u006F World";
+        Escaper escaper = new Escaper('\\');
+        char[] chars = new char[]{'\t', '\b', '\t', '\f', '\n', '\r'};
+        escaper.addCharToEscape(chars);
+
+        String unescaped = escaper.unescape(sJava);
+        TestClassRunner.assertEquals(unescaped,"Hello World");
+    }
+
+    public static void unicode_values_2() {
+        String sJava = "\\u0048\\u0065\\u006C\\u006C\\u006F\\uasdj World";
+        Escaper escaper = new Escaper('\\');
+        char[] chars = new char[]{'\t', '\b', '\t', '\f', '\n', '\r'};
+        escaper.addCharToEscape(chars);
+
+        String unescaped = escaper.unescape(sJava);
+        TestClassRunner.assertEquals(unescaped,"Hello\\uasdj World");
+
+    }
 }

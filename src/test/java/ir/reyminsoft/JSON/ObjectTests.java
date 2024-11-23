@@ -88,8 +88,6 @@ public class ObjectTests implements TestClass {
     }
 
 
-
-
     public static void parses_long() {
         for (int x = 0; x != 1000; x++) {
             long l = random.nextLong();
@@ -107,9 +105,9 @@ public class ObjectTests implements TestClass {
     }
 
     /*
-    * This is a failing test, because the number converter algorithm is not binary wise and small doubles are a problem.
-    * but these tiny errors are negligible.
-    * */
+     * This is a failing test, because the number converter algorithm is not binary wise and small doubles are a problem.
+     * but these tiny errors are negligible.
+     * */
     public static void parses_double() {
         String str = "{\"a\":7.091}";
         JSONObject object = new JSONObject(str);
@@ -149,6 +147,12 @@ public class ObjectTests implements TestClass {
         String str = jsonObject.toString();
         JSONObject object = new JSONObject(str);
         assertEquals(object.toString(), jsonObject.toString());
+    }
+
+    @ThisTestOnly
+    public static void unicode_unescape() {
+        JSONObject jsonObject = new JSONObject("{\"key\":\"\\u0048\\u0065\\u006C\\u006C\\u006F World\"}");
+        assertEquals(jsonObject.getString("key"), "Hello World");
     }
 
     public static void handles_null() {
