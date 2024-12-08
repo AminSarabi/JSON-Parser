@@ -31,7 +31,11 @@ public class Serializer {
                     if (value instanceof JSONObject && field.getType() != JSONObject.class) {
                         if (recursionAvoidSet.containsKey(value)) {
                             value = recursionAvoidSet.get(value);
-                        } else value = deserialize((JSONObject) value, field.getType(), recursionAvoidSet);
+                        } else {
+                            if (field.getType() != Object.class) {
+                                value = deserialize((JSONObject) value, field.getType(), recursionAvoidSet);
+                            }
+                        }
                     }
                     if (value instanceof JSONArray && field.getType() == List.class) {
                         Class s = (Class) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
@@ -100,7 +104,7 @@ public class Serializer {
                                     jsonObject.put(field.getName(), jsonArray);
                                 }
 
-                            }else {
+                            } else {
                                 JSONObject convertedInternalObject = serialize(value, recursionAvoidSet);
                                 jsonObject.put(field.getName(), convertedInternalObject);
                             }
