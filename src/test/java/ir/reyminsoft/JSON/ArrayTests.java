@@ -1,6 +1,10 @@
 package ir.reyminsoft.json;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static ir.reyminsoft.json.TestClassRunner.assertEquals;
 
 public class ArrayTests implements TestClass {
@@ -75,5 +79,12 @@ public class ArrayTests implements TestClass {
         assertEquals(jsonArray.toString(), string);
     }
 
+
+    public static void converting_from_java_array(){
+        List<String> list = Arrays.asList("hi","bye");
+        JSONArray jsonArray = JSONArray.from(list);
+        assertEquals(jsonArray.get(0),list.get(0));
+        assertEquals(jsonArray.get(1),list.get(1));
+    }
 
 }

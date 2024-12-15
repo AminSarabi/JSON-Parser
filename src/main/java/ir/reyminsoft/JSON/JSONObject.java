@@ -1,5 +1,6 @@
 package ir.reyminsoft.json;
 
+import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -13,6 +14,8 @@ public class JSONObject {
 
 
     final int cachedStringLength = 128;
+
+    public static boolean veryPreciseNumericValues = false;
 
     public JSONObject(final String jsonString) {
         this.hashtable = readObject(new Cursor(jsonString));
@@ -148,6 +151,9 @@ public class JSONObject {
     }
 
     static Number readNumeric(Cursor cursor, char ch, char endChar) {
+        if (veryPreciseNumericValues) {
+            return readNumberPrecisely(cursor, ch, endChar);
+        }
         Number n;
         boolean isNegative = ch == '-';
         boolean exponentIsNegative = false;
@@ -228,6 +234,13 @@ public class JSONObject {
         return n;
     }
 
+    private static Number readNumberPrecisely(Cursor cursor, char ch, char endChar) {
+        int startIndex = cursor.currentIndex()-1;
+        huntChar(cursor, endChar);
+        String string = cursor.getRangeAsString(startIndex, cursor.currentIndex()-1);
+        return new BigDecimal(string);
+    }
+
     static Map<String, Object> readObject(final Cursor cursor) {
         return readObject(cursor, 0);
     }
@@ -256,6 +269,20 @@ public class JSONObject {
                 }
             }
             if (ch == '"') {
+                break;
+            }
+        }
+    }
+
+    private static void huntChar(final Cursor cursor, char endChar) {
+        while (cursor.hasNextChar()) {
+            final char ch = cursor.currentCharacter();
+            cursor.increment();
+            if (ch==','){
+                return;
+            }
+            if (ch == endChar) {
+                cursor.mark();
                 break;
             }
         }
@@ -334,19 +361,29 @@ public class JSONObject {
         return get(key);
     }
 
+    public Number getNumber(final String key) {
+        if (!hashtable.containsKey(key)) return 0;
+        return (Number) hashtable.get(key);
+    }
+
+    public BigDecimal getBigDecimal(final String key) {
+        if (!hashtable.containsKey(key)) return BigDecimal.ZERO;
+        return (BigDecimal) hashtable.get(key);
+    }
+
     public int getInt(final String key) {
         if (!hashtable.containsKey(key)) return 0;
-        return (int) hashtable.get(key);
+        return ((Number) hashtable.get(key)).intValue();
     }
 
     public long getLong(final String key) {
         if (!hashtable.containsKey(key)) return 0;
-        return (long) hashtable.get(key);
+        return ((Number) hashtable.get(key)).longValue();
     }
 
     public double getDouble(final String key) {
         if (!hashtable.containsKey(key)) return 0;
-        return (double) hashtable.get(key);
+        return ((Number) hashtable.get(key)).doubleValue();
     }
 
     public boolean getBoolean(final String key) {

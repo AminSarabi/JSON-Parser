@@ -74,6 +74,17 @@ public class Serializer {
         return serialize(o, new Hashtable<>());
     }
 
+    public static JSONArray serializeAsList(List<?> list, Class<?> s) {
+        JSONArray jsonArray = new JSONArray();
+        for (int x = 0; x != list.size(); x++) {
+            Object o = list.get(x);
+            if (o.getClass().isPrimitive() || isWrapperType(o.getClass()) || o.getClass() == String.class) {
+                jsonArray.put(o);
+            } else jsonArray.put(serialize(o));
+        }
+        return jsonArray;
+    }
+
     private static JSONObject serialize(Object o, Hashtable<Object, Object> recursionAvoidSet) {
         try {
             JSONObject jsonObject = new JSONObject();

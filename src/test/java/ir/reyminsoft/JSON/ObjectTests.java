@@ -1,5 +1,6 @@
 package ir.reyminsoft.json;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Hashtable;
 import java.util.Random;
@@ -149,7 +150,7 @@ public class ObjectTests implements TestClass {
         assertEquals(object.toString(), jsonObject.toString());
     }
 
-    @ThisTestOnly
+
     public static void unicode_unescape() {
         JSONObject jsonObject = new JSONObject("{\"key\":\"\\u0048\\u0065\\u006C\\u006C\\u006F World\"}");
         assertEquals(jsonObject.getString("key"), "Hello World");
@@ -196,6 +197,21 @@ public class ObjectTests implements TestClass {
             String value = hashtable.get(key);
             assertEquals(jsonObject.getString(key), value);
         }
+    }
+
+
+    public static void accurateNumbersTest() {
+        JSONObject.veryPreciseNumericValues = true;
+        JSONObject jsonObject = new JSONObject("{\"key\":0912312393094871098120398.123871234891320894172489,\"other\":\"key\"}");
+        assertEquals(jsonObject.getBigDecimal("key"), new BigDecimal("0912312393094871098120398.123871234891320894172489"));
+        JSONObject.veryPreciseNumericValues = false;
+    }
+
+    public static void accurateNumbersTest2() {
+        JSONObject.veryPreciseNumericValues = true;
+        JSONObject jsonObject = new JSONObject("{\"key\":1.8,\"other\":\"key\"}");
+        assertEquals(jsonObject.getDouble("key"), 1.8);
+        JSONObject.veryPreciseNumericValues = false;
     }
 
 }

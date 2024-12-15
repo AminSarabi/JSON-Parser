@@ -1,5 +1,6 @@
 package ir.reyminsoft.json;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,26 @@ public class JSONArray {
 
     JSONArray(final List<Object> objectList) {
         this.objectList = objectList;
+    }
+
+    public static JSONArray from(List<?> list) {
+        JSONArray jsonArray = new JSONArray();
+        for (Object o : list) {
+            if (isUnknownType(o)) {
+                jsonArray.put(Serializer.serialize(o));
+            } else jsonArray.put(o);
+        }
+        return jsonArray;
+    }
+
+    public static JSONArray from(Object... objects) {
+        JSONArray jsonArray = new JSONArray();
+        for (Object o : objects) {
+            if (isUnknownType(o)) {
+                jsonArray.put(Serializer.serialize(o));
+            } else jsonArray.put(o);
+        }
+        return jsonArray;
     }
 
 
@@ -131,12 +152,16 @@ public class JSONArray {
     public void put(Object o) {
         if (o == null) {
             o = NULL;
-        } else if (!(o instanceof String || o instanceof Integer || o instanceof Long || o instanceof Double ||
-                o instanceof Boolean || o instanceof JSONArray
-                || o instanceof JSONObject || o == NULL)) {
+        } else if (isUnknownType(o)) {
             throw new JSONException("unknown type to put in json-array: " + o.getClass());
         }
         this.objectList.add(o);
+    }
+
+    private static boolean isUnknownType(Object o) {
+        return !(o instanceof String || o instanceof Integer || o instanceof Long || o instanceof Double ||
+                o instanceof Boolean || o instanceof JSONArray
+                || o instanceof JSONObject || o == NULL);
     }
 
     public JSONArray getJSONArray(final int i) {
@@ -160,13 +185,24 @@ public class JSONArray {
 
     public int getInteger(final int i) {
         if (i >= objectList.size() || i < 0) return 0;
-        return (int) objectList.get(i);
+        return ((Number) objectList.get(i)).intValue();
     }
 
     public double getDouble(final int i) {
         if (i >= objectList.size() || i < 0) return 0;
-        return (double) objectList.get(i);
+        return ((Number) objectList.get(i)).doubleValue();
     }
+
+    public long getLong(final int i) {
+        if (i >= objectList.size() || i < 0) return 0;
+        return ((Number) objectList.get(i)).longValue();
+    }
+
+    public BigDecimal getBigDecimal(final int i) {
+        if (i >= objectList.size() || i < 0) return BigDecimal.ZERO;
+        return (BigDecimal) objectList.get(i);
+    }
+
 
     public <T> T get(final int i) {
         if (i >= objectList.size() || i < 0) return null;
