@@ -214,4 +214,11 @@ public class ObjectTests implements TestClass {
         JSONObject.veryPreciseNumericValues = false;
     }
 
+
+    public static void unescape_unicode() {
+        System.out.println((char) (0x006F));
+        JSONObject jsonObject = new JSONObject("{\"key\":\"\\u060c\"}");
+        assertEquals(jsonObject.getString("key"), "\u060c");
+    }
+
 }

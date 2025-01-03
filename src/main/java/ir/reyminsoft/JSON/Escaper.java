@@ -147,7 +147,6 @@ class Escaper {
                         char ch = chars[x];
                         switch (ch) {
                             case '0':
-                                hex *= 16;
                                 break;
                             case '1':
                             case '2':
@@ -258,7 +257,6 @@ class Escaper {
                         char ch = charSequence.charAt(x);
                         switch (ch) {
                             case '0':
-                                hex *= 16;
                                 break;
                             case '1':
                             case '2':
