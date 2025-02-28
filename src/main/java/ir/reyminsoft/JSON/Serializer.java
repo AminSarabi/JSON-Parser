@@ -127,7 +127,7 @@ public class Serializer {
             return jsonObject;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("error");
+            throw new RuntimeException(e.getMessage());
         }
     }
 

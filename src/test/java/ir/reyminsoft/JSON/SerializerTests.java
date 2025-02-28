@@ -73,7 +73,7 @@ public class SerializerTests implements TestClass {
     }
 
 
-    @ThisTestOnly
+
     public static void test_internal_array() {
         ObjectTypeFour typeFour = new ObjectTypeFour();
         typeFour.strings = new ArrayList<>();

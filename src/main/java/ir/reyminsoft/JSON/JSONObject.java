@@ -235,9 +235,9 @@ public class JSONObject {
     }
 
     private static Number readNumberPrecisely(Cursor cursor, char ch, char endChar) {
-        int startIndex = cursor.currentIndex()-1;
+        int startIndex = cursor.currentIndex() - 1;
         huntChar(cursor, endChar);
-        String string = cursor.getRangeAsString(startIndex, cursor.currentIndex()-1);
+        String string = cursor.getRangeAsString(startIndex, cursor.currentIndex() - 1);
         return new BigDecimal(string);
     }
 
@@ -278,7 +278,7 @@ public class JSONObject {
         while (cursor.hasNextChar()) {
             final char ch = cursor.currentCharacter();
             cursor.increment();
-            if (ch==','){
+            if (ch == ',') {
                 return;
             }
             if (ch == endChar) {
@@ -400,5 +400,9 @@ public class JSONObject {
         return casted;
     }
 
+
+    public boolean isNull(String key) {
+        return get(key) == null;
+    }
 
 }
