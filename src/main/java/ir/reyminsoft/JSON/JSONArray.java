@@ -131,13 +131,13 @@ public class JSONArray {
             } else {
                 first = false;
             }
-            if (o instanceof Escapable) {
+            if (o == NULL || o == null) {
+                stringBuilder.append("null");
+            } else if (o instanceof Escapable) {
                 final Escapable escapable = (Escapable) o;
                 stringBuilder.append('"').append(escapable.getContentEscaped()).append('"');
             } else if (o instanceof String) {
                 stringBuilder.append('"').append(escaper.escape((String) o)).append('"');
-            } else if (o == NULL) {
-                stringBuilder.append("null");
             } else if (o instanceof JSONObject) {
                 ((JSONObject) o).toString(stringBuilder);
             } else if (o instanceof JSONArray) {

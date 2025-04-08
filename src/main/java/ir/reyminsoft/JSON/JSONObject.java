@@ -330,12 +330,12 @@ public class JSONObject {
             }
             final Object value = hashtable.get(key);
             stringBuilder.append('"').append(stringifyEscaping(key)).append('"').append(':');
-            if (value instanceof Escapable) {
+            if (value == NULL || value == null) {
+                stringBuilder.append("null");
+            } else if (value instanceof Escapable) {
                 stringBuilder.append('"').append(((Escapable) value).getContentEscaped()).append('"');
             } else if (value instanceof String) {
                 stringBuilder.append('"').append(escaper.escape((String) value)).append('"');
-            } else if (value == NULL) {
-                stringBuilder.append("null");
             } else if (value instanceof JSONObject) {
                 ((JSONObject) value).toString(stringBuilder);
             } else if (value instanceof JSONArray) {

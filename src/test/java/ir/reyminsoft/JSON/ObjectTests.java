@@ -160,6 +160,11 @@ public class ObjectTests implements TestClass {
         String str = "{\"a\":NULL,\"b\":null}";
         JSONObject object = new JSONObject(str);
         assertEquals(object.getString("a"), null);
+
+
+        JSONObject sec = new JSONObject();
+        sec.put("a", null).put("b", null);
+        assertEquals(sec.toString(), str.toLowerCase());
     }
 
 
