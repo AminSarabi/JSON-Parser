@@ -3,6 +3,7 @@ package ir.reyminsoft.json;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 @SuppressWarnings({"UnusedReturnValue", "unused"})
 public class JSONObject {
@@ -347,6 +348,28 @@ public class JSONObject {
         stringBuilder.append("}");
     }
 
+
+    public Set<String> keySet() {
+        return hashtable.keySet();
+    }
+
+    public JSONObject getJSONObjectCreateIfAbsent(String key) {
+        if (isNull(key)) {
+            JSONObject jsonObject = new JSONObject();
+            put(key, jsonObject);
+            return jsonObject;
+        }
+        return getJSONObject(key);
+    }
+
+    public JSONArray getJSONArrayCreateIfAbsent(String key) {
+        if (isNull(key)) {
+            JSONArray jsonObject = new JSONArray();
+            put(key, jsonObject);
+            return jsonObject;
+        }
+        return getJSONArray(key);
+    }
 
     public JSONObject getJSONObject(final String key) {
         final Object object = hashtable.get(key);
