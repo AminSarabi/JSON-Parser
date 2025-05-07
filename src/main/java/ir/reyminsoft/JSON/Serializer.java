@@ -94,8 +94,7 @@ public class Serializer {
                 if (!Modifier.isPublic(field.getModifiers()))
                     throw new RuntimeException("serialized object " + o.getClass().getSimpleName() + "  has non public values: " + field.getName());
                 Object value = field.get(o);
-                if (value == null) value = JSONObject.NULL;
-                if (JSONObject.validateType(value) != null) {
+                if (JSONObject.isUnknownType(value)) {
                     if (field.getType().isPrimitive()) {
                         jsonObject.put(field.getName(), value);
                     } else {

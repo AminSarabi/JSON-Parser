@@ -10,7 +10,6 @@ public class JSONObject {
 
     static final ObjectEscaper escaper = new ObjectEscaper();
 
-    static final Object NULL = new Object();
     private final Map<String, Object> hashtable;
 
 
@@ -99,7 +98,7 @@ public class JSONObject {
                 case 'n':
                 case 'N':
                     if (readingValue) {
-                        table.put(currentKey, NULL);
+                        table.put(currentKey, null);
                         cursor.increment(3);
                         readingValue = false;
                         currentKey = null;
@@ -295,23 +294,27 @@ public class JSONObject {
 
 
     public JSONObject put(final String key, final Object o) {
-        String possibleError = validateType(o);
-        if (possibleError != null) throw new JSONException(possibleError);
+        if (key == null) throw new JSONException("key can not be null!");
+        if (isUnknownType(o)) {
+            try {
+                return put(key, Serializer.serialize(o));
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new JSONException("unknown type to put in json-object: " + o.getClass());
+            }
+
+        }
         this.hashtable.put(key, o);
         return this;
     }
 
-    public static String validateType(Object o) {
-        String error = null;
-        if (o == null) {
-            return null;
-        } else if (!(o instanceof String || o instanceof Integer || o instanceof Long || o instanceof Double ||
+    public static boolean isUnknownType(Object o) {
+        if (o == null) return false;
+        return !(o instanceof String || o instanceof Integer || o instanceof Long || o instanceof Double ||
                 o instanceof Boolean || o instanceof JSONArray
-                || o instanceof JSONObject || o == JSONObject.NULL)) {
-            error = "unknown type to put in json-object: " + o.getClass();
-        }
-        return error;
+                || o instanceof JSONObject);
     }
+
 
     @Override
     public String toString() { //todo if the content is not modified, use a cached string (weak reference)
@@ -323,15 +326,15 @@ public class JSONObject {
     void toString(final StringBuilder stringBuilder) {
         stringBuilder.append("{");
         boolean first = true;
-        for (final String key : hashtable.keySet()) {
+        for (final String key : keySet()) {
             if (!first) {
                 stringBuilder.append(',');
             } else {
                 first = false;
             }
-            final Object value = hashtable.get(key);
+            final Object value = get(key);
             stringBuilder.append('"').append(stringifyEscaping(key)).append('"').append(':');
-            if (value == NULL || value == null) {
+            if (value == null) {
                 stringBuilder.append("null");
             } else if (value instanceof Escapable) {
                 stringBuilder.append('"').append(((Escapable) value).getContentEscaped()).append('"');
@@ -372,50 +375,53 @@ public class JSONObject {
     }
 
     public JSONObject getJSONObject(final String key) {
-        final Object object = hashtable.get(key);
-        return (JSONObject) object;
+        if (isNull(key)) return null;
+        return get(key);
     }
 
     public JSONArray getJSONArray(final String key) {
+        if (isNull(key)) return null;
         return get(key);
     }
 
     public String getString(final String key) {
+        if (isNull(key)) return null;
         return get(key);
     }
 
     public Number getNumber(final String key) {
-        if (!hashtable.containsKey(key)) return 0;
+        if (isNull(key)) return 0;
         return (Number) hashtable.get(key);
     }
 
     public BigDecimal getBigDecimal(final String key) {
-        if (!hashtable.containsKey(key)) return BigDecimal.ZERO;
+        if (isNull(key)) return BigDecimal.ZERO;
         return (BigDecimal) hashtable.get(key);
     }
 
     public int getInt(final String key) {
-        if (!hashtable.containsKey(key)) return 0;
+        if (isNull(key)) return 0;
         return ((Number) hashtable.get(key)).intValue();
     }
 
     public long getLong(final String key) {
-        if (!hashtable.containsKey(key)) return 0;
+        if (isNull(key)) return 0;
         return ((Number) hashtable.get(key)).longValue();
     }
 
     public double getDouble(final String key) {
-        if (!hashtable.containsKey(key)) return 0;
+        if (isNull(key)) return 0;
         return ((Number) hashtable.get(key)).doubleValue();
     }
 
     public boolean getBoolean(final String key) {
+        if (isNull(key)) return false;
         return get(key);
     }
 
     public <T> T get(final String key) {
         Object o = hashtable.get(key);
-        if (o == null || o == NULL) return null;
+        if (o == null) return null;
         if (o instanceof Escapable) {
             o = ((Escapable) o).getContentUnescaped(escaper);
         }

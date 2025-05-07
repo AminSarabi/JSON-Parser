@@ -50,6 +50,24 @@ public class SerializerTests implements TestClass {
         assertEquals(one_1, one_2);
     }
 
+    public static void test_nested_empty_object() {
+        JSONObject jsonObject = new JSONObject();
+        JSONObject some = jsonObject.getJSONObjectCreateIfAbsent("some");
+        some.getJSONObjectCreateIfAbsent("some2");
+        assertEquals("{\"some\":{\"some2\":{}}}", jsonObject.toString());
+    }
+
+    public static void test_null_key() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(null, new JSONObject());
+            System.out.println(jsonObject.toString());
+            throw new RuntimeException("key could be null!");
+        } catch (JSONException ignored) {
+
+        }
+
+    }
 
     public static void test_internal_object_recursion() {
         ObjectTypeOne one_1 = new ObjectTypeOne();
@@ -71,7 +89,6 @@ public class SerializerTests implements TestClass {
         JSONObject jsonObject = Serializer.serialize(one_1);
         ObjectTypeThree one_2 = Serializer.deserialize(jsonObject, ObjectTypeThree.class);
     }
-
 
 
     public static void test_internal_array() {

@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ir.reyminsoft.json.JSONObject.NULL;
 
 public class JSONArray {
     private static final Escaper escaper;
@@ -86,7 +85,7 @@ public class JSONArray {
                     break;
                 case 'n':
                 case 'N':
-                    list.add(NULL);
+                    list.add(null);
                     cursor.increment(3);
                     break;
                 case '+':
@@ -131,7 +130,7 @@ public class JSONArray {
             } else {
                 first = false;
             }
-            if (o == NULL || o == null) {
+            if (o == null) {
                 stringBuilder.append("null");
             } else if (o instanceof Escapable) {
                 final Escapable escapable = (Escapable) o;
@@ -150,18 +149,23 @@ public class JSONArray {
     }
 
     public void put(Object o) {
-        if (o == null) {
-            o = NULL;
-        } else if (isUnknownType(o)) {
-            throw new JSONException("unknown type to put in json-array: " + o.getClass());
+        if (isUnknownType(o)) {
+            try {
+                put(Serializer.serialize(o));
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new JSONException("unknown type to put in json-array: " + o.getClass());
+            }
+
         }
         this.objectList.add(o);
     }
 
     private static boolean isUnknownType(Object o) {
+        if (o == null) return false;
         return !(o instanceof String || o instanceof Integer || o instanceof Long || o instanceof Double ||
                 o instanceof Boolean || o instanceof JSONArray
-                || o instanceof JSONObject || o == NULL);
+                || o instanceof JSONObject);
     }
 
     public JSONArray getJSONArray(final int i) {
@@ -207,7 +211,7 @@ public class JSONArray {
     public <T> T get(final int i) {
         if (i >= objectList.size() || i < 0) return null;
         Object o = objectList.get(i);
-        if (o == null || o == NULL) return null;
+        if (o == null) return null;
         if (o instanceof Escapable) {
             o = ((Escapable) o).getContentUnescaped(escaper);
         }
