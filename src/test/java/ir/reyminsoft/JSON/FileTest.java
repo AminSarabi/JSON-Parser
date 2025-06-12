@@ -17,6 +17,6 @@ public class FileTest implements TestClass {
         System.out.println("read " + read + " bytes from the file.");
         final String text = new String(bytes).replaceAll("\\n", "");
         JSONArray jsonArray = new JSONArray(text);
-        TestClassRunner.assertEquals(text, jsonArray.toString());
+        TestClassRunner.assertEqualsSilent(text, jsonArray.toString());
     }
 }

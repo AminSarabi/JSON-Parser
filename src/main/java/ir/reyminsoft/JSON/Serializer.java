@@ -20,10 +20,11 @@ public class Serializer {
         try {
             T t = clazz.getConstructor().newInstance();
             recursionAvoidSet.put(jsonObject, t);
-            Field[] fields = clazz.getDeclaredFields();
+            List<Field> fields = getAllFields(clazz);
             for (Field field : fields) {
                 if (Modifier.isStatic(field.getModifiers())) continue;
                 Object value = jsonObject.get(field.getName());
+                field.setAccessible(true);
                 //JSONObject.NULL conversion is not needed as jsonObject.get already handles it.
                 if (field.getType().isPrimitive()) {
                     if (value != null) field.set(t, value);
@@ -85,14 +86,27 @@ public class Serializer {
         return jsonArray;
     }
 
+
+    public static List<Field> getAllFields(Class<?> clazz) {
+        List<Field> fields = new ArrayList<>();
+
+        while (clazz != null) {
+            Field[] declaredFields = clazz.getDeclaredFields(); // includes private, protected, etc.
+            Collections.addAll(fields, declaredFields);
+            clazz = clazz.getSuperclass();
+        }
+
+        return fields;
+    }
+
     private static JSONObject serialize(Object o, Hashtable<Object, Object> recursionAvoidSet) {
         try {
             JSONObject jsonObject = new JSONObject();
             recursionAvoidSet.put(o, jsonObject);
-            for (Field field : o.getClass().getDeclaredFields()) {
+            List<Field> fields = getAllFields(o.getClass());
+            for (Field field : fields) {
                 if (Modifier.isStatic(field.getModifiers())) continue;
-                if (!Modifier.isPublic(field.getModifiers()))
-                    throw new RuntimeException("serialized object " + o.getClass().getSimpleName() + "  has non public values: " + field.getName());
+                field.setAccessible(true);
                 Object value = field.get(o);
                 if (JSONObject.isUnknownType(value)) {
                     if (field.getType().isPrimitive()) {
@@ -126,7 +140,7 @@ public class Serializer {
             return jsonObject;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 

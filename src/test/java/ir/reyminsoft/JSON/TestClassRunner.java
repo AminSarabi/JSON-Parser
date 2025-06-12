@@ -16,6 +16,11 @@ public class TestClassRunner {
             throw new RuntimeException("assertion error: '" + stringify(o) + "' != '" + stringify(o2) + "'");
     }
 
+    public static void assertEqualsSilent(final Object o, final Object o2) {
+        if (!Utils.equals(o, o2))
+            throw new RuntimeException("assertion error: equality check failed.");
+    }
+
     public static void assertEquals(final Object o, final Object o2, String message) {
         if (!Utils.equals(o, o2))
             throw new RuntimeException("assertion error: '" + stringify(o) + "' != '" + stringify(o2) + "' \n" + message);
