@@ -308,6 +308,10 @@ public class JSONObject {
         return this;
     }
 
+    public void remove(String key) {
+        this.hashtable.remove(key);
+    }
+
     public static boolean isUnknownType(Object o) {
         if (o == null) return false;
         return !(o instanceof String || o instanceof Integer || o instanceof Long || o instanceof Double ||
@@ -372,6 +376,15 @@ public class JSONObject {
             return jsonObject;
         }
         return getJSONArray(key);
+    }
+
+    public int incrementInitializingWithZero(String key) {
+        if (hashtable.containsKey(key)) {
+            put(key, getInt(key) + 1);
+        } else {
+            put(key, 1);
+        }
+        return getInt(key);
     }
 
     public JSONObject getJSONObject(final String key) {

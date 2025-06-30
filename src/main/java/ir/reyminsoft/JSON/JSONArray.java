@@ -161,6 +161,14 @@ public class JSONArray {
         this.objectList.add(o);
     }
 
+    public void remove(int x) {
+        this.objectList.remove(x);
+    }
+
+    public boolean remove(Object o) {
+        return this.objectList.remove(o);
+    }
+
     private static boolean isUnknownType(Object o) {
         if (o == null) return false;
         return !(o instanceof String || o instanceof Integer || o instanceof Long || o instanceof Double ||
@@ -226,5 +234,18 @@ public class JSONArray {
 
     public int length() {
         return size();
+    }
+
+
+    public <T> void forEach(JSONArrayForEachConsumer<T> consumer) {
+        for (int x = 0; x != length(); x++) {
+            consumer.consume(get(x));
+        }
+    }
+
+
+    public interface JSONArrayForEachConsumer<T> {
+        void consume(T t);
+
     }
 }
